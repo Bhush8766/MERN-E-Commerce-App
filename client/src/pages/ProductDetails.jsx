@@ -57,7 +57,7 @@ const product = selectedProduct;
 
   if(!product)
   {  
-
+    
     return (
 
       <div className="text-center py-20 text-xl">
