@@ -326,7 +326,8 @@ const { products, loading } = useSelector(
     </div>
   )}
 
-</div>
+ 
+</div>   
 
   </div>
 
