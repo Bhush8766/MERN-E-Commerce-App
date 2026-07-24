@@ -1,135 +1,446 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+
+import {
+  getCartApi,
+  addToCartApi,
+  updateCartApi,
+  removeCartApi,
+  clearCartApi,
+} from "../api/cartApi";
+
+
+
+
+// ===============================
+// Get Cart
+// ===============================
+
+export const getCart = createAsyncThunk(
+  "cart/getCart",
+
+  async (_, { rejectWithValue }) => {
+
+    try {
+
+      return await getCartApi();
+
+    } catch(err) {
+
+      return rejectWithValue(
+        err.response?.data?.message ||
+        "Failed to load cart"
+      );
+
+    }
+
+  }
+);
+
+
+
+
+
+
+
+// ===============================
+// Add To Cart
+// ===============================
+export const addToCart = createAsyncThunk(
+    "cart/addToCart",
+    async (cartData, thunkAPI) => {
+        try {
+            return await addToCartApi(cartData);
+        } catch (err) {
+            return thunkAPI.rejectWithValue(
+                err.response.data.message
+            );
+        }
+    }
+);
+
+
+
+
+
+
+
+
+// ===============================
+// Update Cart
+// ===============================
+
+export const updateCart = createAsyncThunk(
+
+"cart/updateCart",
+
+async({id,quantity},{rejectWithValue})=>{
+
+
+try{
+
+return await updateCartApi(
+id,
+quantity
+);
+
+
+}
+catch(err){
+
+
+return rejectWithValue(
+
+err.response?.data?.message ||
+"Failed to update cart"
+
+);
+
+
+}
+
+
+}
+
+);
+
+
+
+
+
+
+
+
+
+// ===============================
+// Remove Cart
+// ===============================
+
+
+export const removeCart = createAsyncThunk(
+
+"cart/removeCart",
+
+async(id,{rejectWithValue})=>{
+
+
+try{
+
+
+await removeCartApi(id);
+
+return id;
+
+
+}
+catch(err){
+
+
+return rejectWithValue(
+
+err.response?.data?.message ||
+"Failed to remove item"
+
+);
+
+
+}
+
+
+}
+
+);
+
+
+
+
+
+
+
+
+
+// ===============================
+// Clear Cart
+// ===============================
+
+
+export const clearCart = createAsyncThunk(
+
+"cart/clearCart",
+
+async(_,{rejectWithValue})=>{
+
+
+try{
+
+
+await clearCartApi();
+
+return true;
+
+
+}
+catch(err){
+
+
+return rejectWithValue(
+
+err.response?.data?.message ||
+"Failed to clear cart"
+
+);
+
+
+}
+
+
+}
+
+);
+
+
+
+
+
+
+
+
+
+// ===============================
+// Initial State
+// ===============================
 
 
 const initialState={
 
-    items:[]
+
+items:[],
+
+
+loading:false,
+
+
+error:null
+
+
 
 };
 
 
 
+
+
+
+
+
+
+// ===============================
+// Slice
+// ===============================
+
+
 const cartSlice=createSlice({
 
-    name:"cart",
-
-    initialState,
+name:"cart",
 
 
-    reducers:{
+initialState,
 
 
-        addToCart:(state,action)=>{
-
-
-            const existing = state.items.find(
-                item=>item._id===action.payload._id
-            );
+reducers:{},
 
 
 
-            if(existing){
-
-                existing.quantity +=1;
-
-            }
-
-            else{
+extraReducers:(builder)=>{
 
 
-                state.items.push({
-
-                    ...action.payload,
-
-                    quantity:1
-
-                });
-
-
-            }
-
-
-        },
+builder
 
 
 
-        removeFromCart:(state,action)=>{
+// ===============================
+// GET CART
+// ===============================
 
 
-            state.items =
-            state.items.filter(
-                item=>item._id !== action.payload
-            );
+.addCase(
+getCart.pending,
+(state)=>{
 
+state.loading=true;
 
-        },
-
-
-
-        increaseQuantity:(state,action)=>{
-
-
-            const item =
-            state.items.find(
-                item=>item._id===action.payload
-            );
-
-
-            if(item){
-
-                item.quantity +=1;
-
-            }
-
-
-        },
+}
+)
 
 
 
-        decreaseQuantity:(state,action)=>{
+.addCase(
+getCart.fulfilled,
+(state,action)=>{
 
 
-            const item =
-            state.items.find(
-                item=>item._id===action.payload
-            );
+state.loading=false;
 
 
-            if(item && item.quantity>1){
-
-                item.quantity -=1;
-
-            }
+state.items =
+action.payload?.cart?.products || [];
 
 
-        },
+}
+)
 
 
 
-        clearCart:(state)=>{
-
-            state.items=[];
-
-        }
+.addCase(
+getCart.rejected,
+(state,action)=>{
 
 
-    }
+state.loading=false;
+
+state.error=action.payload;
+
+
+}
+)
+
+
+
+
+
+
+
+
+
+// ===============================
+// ADD CART
+// ===============================
+
+
+.addCase(
+addToCart.pending,
+(state)=>{
+
+state.loading=true;
+
+}
+)
+
+
+
+.addCase(
+addToCart.fulfilled,
+(state,action)=>{
+
+
+state.loading=false;
+
+
+state.items =
+action.payload?.cart?.products || [];
+
+
+}
+)
+
+
+
+.addCase(
+addToCart.rejected,
+(state,action)=>{
+
+
+state.loading=false;
+
+state.error=action.payload;
+
+
+}
+)
+
+
+
+
+
+
+
+
+
+// ===============================
+// UPDATE CART
+// ===============================
+
+
+.addCase(
+updateCart.fulfilled,
+(state,action)=>{
+
+
+state.items =
+action.payload?.cart?.products || [];
+
+
+}
+)
+
+
+
+
+
+
+
+
+// ===============================
+// REMOVE CART
+// ===============================
+
+
+.addCase(
+removeCart.fulfilled,
+(state,action)=>{
+
+
+state.items =
+state.items.filter(
+
+(item)=>
+item._id !== action.payload
+
+);
+
+
+}
+)
+
+
+
+
+
+
+
+
+// ===============================
+// CLEAR CART
+// ===============================
+
+
+.addCase(
+clearCart.fulfilled,
+(state)=>{
+
+
+state.items=[];
+
+
+}
+);
+
+
+
+}
 
 
 });
 
-
-
-export const {
-
-addToCart,
-removeFromCart,
-increaseQuantity,
-decreaseQuantity,
-clearCart
-
-
-}=cartSlice.actions;
 
 
 

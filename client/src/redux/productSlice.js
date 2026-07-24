@@ -1,117 +1,105 @@
-import {createSlice,createAsyncThunk}
-from "@reduxjs/toolkit";
-
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../api/axiosInstance";
+import { getSingleProductApi } from "../api/productApi";
 
-
+// =============================
 // Get All Products
+// =============================
+export const getProducts = createAsyncThunk(
+  "product/getProducts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/products");
 
-export const getProducts=createAsyncThunk(
+      console.log("Products API Response:", response.data);
 
-"products/getProducts",
-
-async()=>{
-
-const response =
-await axiosInstance.get("/products");
-
-
-return response.data;
-
-}
-
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch products"
+      );
+    }
+  }
 );
 
-
+// =============================
 // Get Single Product
+// =============================
+export const getSingleProduct = createAsyncThunk(
+  "product/getSingleProduct",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await getSingleProductApi(id);
 
-export const getSingleProduct=createAsyncThunk(
-
-"products/getSingleProduct",
-
-async(id)=>{
-
-
-const response =
-await axiosInstance.get(
-`/products/${id}`
+      return response;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch product"
+      );
+    }
+  }
 );
 
+// =============================
+// Initial State
+// =============================
+const initialState = {
+    products: [],
+    selectedProduct: null,
+    product: null,
+    loading: false,
+    error: null,
+};
 
-return response.data;
+// =============================
+// Slice
+// =============================
+const productSlice = createSlice({
+  name: "product",
 
+  initialState,
 
-}
+  reducers: {},
 
-);
+  extraReducers: (builder) => {
+    builder
 
+      // =============================
+      // Get Products
+      // =============================
+      .addCase(getProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
 
+      .addCase(getProducts.fulfilled, (state, action) => {
+        state.loading = false;
 
-const productSlice=createSlice({
+        state.products = action.payload.products || [];
+      })
 
-name:"products",
+      .addCase(getProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
+      // =============================
+      // Get Single Product
+      // =============================
+      .addCase(getSingleProduct.pending, (state) => {
+        state.loading = true;
+      })
 
-initialState:{
-
-
-products:[],
-
-selectedProduct:null,
-
-loading:false,
-
-error:null
-
-
-},
-
-
-reducers:{},
-
-
-
-extraReducers:(builder)=>{
-
-
-builder
-
-
-.addCase(getProducts.pending,(state)=>{
-
-state.loading=true;
-
+    .addCase(getSingleProduct.fulfilled, (state, action) => {
+    state.loading = false;
+    state.product = action.payload.product;
 })
 
-
-.addCase(
-getProducts.fulfilled,
-(state,action)=>{
-
-state.loading=false;
-
-state.products =
-action.payload.products || action.payload;
-
-}
-)
-
-
-.addCase(getSingleProduct.fulfilled,
-
-(state,action)=>{
-
-state.selectedProduct=
-action.payload;
-
+      .addCase(getSingleProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
 });
-
-
-}
-
-
-});
-
-
 
 export default productSlice.reducer;

@@ -1,54 +1,47 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-
 import authReducer from "./authSlice";
 import productReducer from "./productSlice";
 import cartReducer from "./cartSlice";
-import WishlistReducer from "./wishlistSlice"
-
+import wishlistReducer from "./wishlistSlice";
 import orderReducer from "./orderSlice";
-
 import adminReducer from "./adminSlice";
-
 import categoryReducer from "./categorySlice";
-
 import brandReducer from "./brandSlice";
-
 import userReducer from "./userSlice";
-
 import dashboardReducer from "./dashboardSlice";
 
-
 const store = configureStore({
+  reducer: {
+    auth: authReducer,
 
-reducer:{
+    // Product Slice
+     product: productReducer,
 
+    // Cart
+    cart: cartReducer,
 
-auth:authReducer,
+    // Wishlist
+    wishlist: wishlistReducer,
 
-products:productReducer,
+    // Orders
+    orders: orderReducer,
 
-cart:cartReducer,
+    // Admin
+    admin: adminReducer,
 
-wishlist:WishlistReducer,
+    // Categories
+    category: categoryReducer,
 
-orders:orderReducer,
+    // Brands
+    brand: brandReducer,
 
-admin: adminReducer,
+    // Users
+    users: userReducer,
 
-category: categoryReducer,
-
-brand: brandReducer,
-
-users: userReducer,
-
-dashboard: dashboardReducer,
-
-
-}
-
-
+    // Dashboard
+    dashboard: dashboardReducer,
+  },
 });
-
 
 export default store;

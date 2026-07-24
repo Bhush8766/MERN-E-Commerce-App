@@ -13,6 +13,14 @@ export const getProducts = createAsyncThunk(
   }
 );
 
+// ===============================
+// Get Single Product
+// ===============================
+export const getSingleProductApi = async (id) => {
+  const { data } = await axiosInstance.get(`/products/${id}`);
+  return data;
+};
+
 
 const productSlice = createSlice({
 

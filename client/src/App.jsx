@@ -38,6 +38,8 @@ import Profile from "./pages/Profile";
 import Checkout from "./pages/Checkout";
 import MyOrders from "./pages/MyOrders";
 
+import Wishlist from "./pages/Wishlist";
+
 
 
 // Routes
@@ -159,8 +161,8 @@ element={<Shop />}
 
 
 <Route
-path="/product/:id"
-element={<ProductDetails />}
+    path="/product/:id"
+    element={<ProductDetails />}
 />
 
 
@@ -170,11 +172,15 @@ element={<Cart />}
 />
 
 
+
 </Route>
 
 
 
-
+<Route
+  path="/wishlist"
+  element={<Wishlist />}
+/>
 
 
 

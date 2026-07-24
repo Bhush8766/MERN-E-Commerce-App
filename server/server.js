@@ -32,6 +32,7 @@ const adminRoutes =
 require("./routes/adminRoute");
 
 
+
 // ===============================
 // Error Middleware
 // ===============================
@@ -92,9 +93,13 @@ app.use(
 );
 
 
-
+// ✅ Updated Helmet
 app.use(
-    helmet()
+  helmet({
+    crossOriginResourcePolicy: {
+      policy: "cross-origin",
+    },
+  })
 );
 
 
@@ -104,20 +109,14 @@ app.use(
 );
 
 
-
 // ===============================
 // Static Folder
 // ===============================
 
 app.use(
-    "/uploads",
-    express.static(
-        path.join(__dirname,"uploads")
-    )
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
 );
-
-
-
 
 // ===============================
 // API Routes

@@ -3,6 +3,11 @@ const Product = require("../models/productModel");
 
 // Create Product
 exports.createProduct = asyncHandler(async (req, res) => {
+
+   console.log("BODY:", req.body);
+  console.log("FILES:", req.files);
+
+  
   const {
     title,
     description,
@@ -56,41 +61,43 @@ exports.createProduct = asyncHandler(async (req, res) => {
     "-" +
     Math.floor(Math.random() * 1000);
 
-  const product = await Product.create({
-    title,
-    slug,
-    sku,
+ const thumbnailFile = req.files?.thumbnail?.[0];
 
-    description,
-    shortDescription,
+const product = await Product.create({
+  title,
+  slug,
+  sku,
 
-    category,
-    brand,
+  description,
+  shortDescription,
 
-    price,
-    stock,
+  category,
+  brand,
 
-    discountPrice,
-    costPrice,
+  price,
+  stock,
 
-    colors,
-    sizes,
-    tags,
+  discountPrice,
+  costPrice,
 
-    shippingCharge,
-    freeShipping,
-    weight,
+  colors,
+  sizes,
+  tags,
 
-    warranty,
-    returnPolicy,
+  shippingCharge,
+  freeShipping,
+  weight,
 
-    thumbnail: {
-      public_id: "",
-      url: req.file ? req.file.path : "",
-    },
+  warranty,
+  returnPolicy,
 
-    createdBy: req.user ? req.user._id : null,
-  });
+  thumbnail: {
+    public_id: "",
+    url: thumbnailFile ? thumbnailFile.path : "",
+  },
+
+  createdBy: req.user ? req.user._id : null,
+});
 
   res.status(201).json({
     success: true,
@@ -244,12 +251,14 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   product.costPrice =
     req.body.costPrice || product.costPrice;
 
-  if (req.file) {
-    product.thumbnail = {
-      public_id: "",
-      url: req.file.path,
-    };
-  }
+ const thumbnailFile = req.files?.thumbnail?.[0];
+
+if (thumbnailFile) {
+  product.thumbnail = {
+    public_id: "",
+    url: thumbnailFile.path,
+  };
+}
 
   await product.save();
 

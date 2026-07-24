@@ -230,17 +230,17 @@ className="border"
 
 <td>
 
-<img
-
-src={
-product.thumbnail?.url
-}
-
-className="
-w-16 h-16 object-cover
-"
-
-/>
+{product.thumbnail?.url ? (
+  <img
+    src={`http://localhost:5000/${product.thumbnail.url}`}
+    alt={product.title}
+    className="w-16 h-16 object-cover rounded"
+  />
+) : (
+  <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center text-xs">
+    No Image
+  </div>
+)}
 
 </td>
 

@@ -18,6 +18,10 @@ const { user } = useSelector(
 );
 
 
+const { count } = useSelector(
+  (state) => state.wishlist
+);
+
 const cartItems =
 useSelector(
 state=>state.cart.items

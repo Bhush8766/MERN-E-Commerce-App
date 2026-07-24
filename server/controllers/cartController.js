@@ -73,19 +73,30 @@ exports.addToCart = asyncHandler(async (req, res) => {
 exports.getMyCart = asyncHandler(async (req, res) => {
 
   const cart = await Cart.findOne({ user: req.user.id })
-    .populate("products.product");
+    .populate({
+      path: "products.product",
+      select: "title price thumbnail stock",
+    });
 
   if (!cart) {
-    return res.status(404).json({
-      success: false,
-      message: "Cart is empty",
+    return res.status(200).json({
+      success: true,
+      cart: {
+        products: [],
+        totalItems: 0,
+        totalPrice: 0,
+      },
     });
   }
+
+  console.log("Cart Response:");
+  console.log(JSON.stringify(cart, null, 2));
 
   res.status(200).json({
     success: true,
     cart,
   });
+
 });
 
 // ===============================
