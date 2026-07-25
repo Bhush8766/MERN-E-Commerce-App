@@ -1,48 +1,217 @@
-import { Link } from "react-router-dom";
-import { CheckCircle } from "lucide-react";
+import {
+  CheckCircle,
+  Package,
+  ShoppingBag,
+} from "lucide-react";
 
-function PaymentSuccess() {
-  return (
-    <div className="min-h-screen bg-green-50 flex items-center justify-center px-4">
 
-      <div className="bg-white rounded-2xl shadow-xl p-10 max-w-lg w-full text-center">
+import {
+  Link,
+  useParams,
+} from "react-router-dom";
 
-        <CheckCircle
-          size={90}
-          className="mx-auto text-green-600"
-        />
 
-        <h1 className="text-4xl font-bold mt-6 text-green-700">
-          Payment Successful!
-        </h1>
+import {
+useDispatch,
+useSelector
+} from "react-redux";
 
-        <p className="text-gray-600 mt-4 leading-7">
-          Thank you for shopping with us.
-          Your order has been placed successfully.
-        </p>
 
-        <div className="mt-8 space-y-4">
+import {
+getOrderDetails
+} from "../redux/orderSlice";
 
-          <Link
-            to="/my-orders"
-            className="block w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition"
-          >
-            View My Orders
-          </Link>
 
-          <Link
-            to="/shop"
-            className="block w-full border border-green-600 text-green-600 hover:bg-green-50 py-3 rounded-lg font-semibold transition"
-          >
-            Continue Shopping
-          </Link>
+import {
+    useEffect,
+    useState
+} from "react";
 
-        </div>
 
-      </div>
+const PaymentSuccess =()=>{
 
-    </div>
-  );
-}
+
+const {id}=useParams();
+
+const dispatch = useDispatch();
+
+
+useEffect(()=>{
+
+dispatch(
+ getOrderDetails(id)
+);
+
+},[dispatch,id]);
+
+
+return (
+
+<div className="
+min-h-screen
+bg-gray-50
+flex
+items-center
+justify-center
+px-6
+">
+
+
+<div className="
+bg-white
+rounded-2xl
+shadow-lg
+p-10
+max-w-md
+w-full
+text-center
+">
+
+
+<CheckCircle
+
+size={80}
+
+className="
+mx-auto
+text-green-600
+mb-6
+"
+
+/>
+
+
+
+<h1 className="
+text-3xl
+font-bold
+text-gray-800
+mb-3
+">
+
+Payment Successful 🎉
+
+</h1>
+
+
+
+<p className="
+text-gray-600
+mb-6
+">
+
+Your order has been placed successfully.
+
+</p>
+
+
+
+<div className="
+bg-gray-100
+rounded-xl
+p-4
+mb-6
+">
+
+
+<p className="
+text-sm
+text-gray-500
+">
+
+Order ID
+
+</p>
+
+
+<p className="
+font-semibold
+break-all
+">
+
+{id}
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div className="
+space-y-3
+">
+
+
+<Link
+
+to={`/order/${id}`}
+
+className="
+flex
+items-center
+justify-center
+gap-2
+bg-blue-600
+text-white
+py-3
+rounded-xl
+hover:bg-blue-700
+"
+
+>
+
+
+<Package size={20}/>
+
+View Order
+
+</Link>
+
+
+
+
+
+<Link
+
+to="/shop"
+
+className="
+flex
+items-center
+justify-center
+gap-2
+border
+py-3
+rounded-xl
+"
+
+>
+
+
+<ShoppingBag size={20}/>
+
+Continue Shopping
+
+</Link>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+);
+
+
+};
+
 
 export default PaymentSuccess;

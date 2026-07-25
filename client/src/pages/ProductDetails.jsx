@@ -1,6 +1,19 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams, Link } from "react-router-dom";
+import {
+  useEffect,
+  useState
+} from "react";
+
+
+import {
+  useDispatch,
+  useSelector
+} from "react-redux";
+
+
+import {
+  useParams
+} from "react-router-dom";
+
 
 import {
   ShoppingCart,
@@ -9,52 +22,175 @@ import {
   Truck,
   ShieldCheck,
   Minus,
-  Plus,
+  Plus
 } from "lucide-react";
 
-import { getSingleProduct } from "../redux/productSlice";
-import { addToCart } from "../redux/cartSlice";
-import { addWishlist } from "../redux/wishlistSlice";
+
+import {
+  toast
+} from "react-toastify";
+
+
+
+import {
+  getSingleProduct
+} from "../redux/productSlice";
+
+
+import {
+  addToCart
+} from "../redux/cartSlice";
+
+
+import {
+  addWishlist
+} from "../redux/wishlistSlice";
+
+
+
+import {
+  getProductReviews,
+  createReview,
+  deleteReview
+} from "../redux/reviewSlice";
+
+
 
 import Loader from "../components/Loader";
+
 import ProductCard from "../components/ProductCard";
 
 
-const ProductDetails = () => {
+import ReviewSummary from "../components/ReviewSummary";
 
-  const { id } = useParams();
+import ReviewList from "../components/ReviewList";
 
-  const dispatch = useDispatch();
+import ReviewForm from "../components/ReviewForm";
 
 
-  const {
-  singleProduct,
-  loading,
-  products
-} = useSelector(
-  (state)=>state.product
+
+
+
+const ProductDetails =()=>{
+
+
+const {
+id
+}=useParams();
+
+
+const dispatch = useDispatch();
+
+
+
+
+
+const {
+
+singleProduct,
+loading,
+products
+
+}=useSelector(
+state=>state.product
 );
 
-  const [selectedImage, setSelectedImage] = useState("");
-  const [quantity, setQuantity] = useState(1);
 
 
 
-  // Fetch Product
-  useEffect(() => {
 
-    if(id){
-      dispatch(getSingleProduct(id));
-    }
+const {
 
-  },[dispatch,id]);
+user
+
+}=useSelector(
+state=>state.auth
+);
 
 
 
-  // Set Main Image
- useEffect(()=>{
+
+
+const {
+
+reviews,
+averageRating,
+totalReviews,
+loading:reviewLoading
+
+}=useSelector(
+state=>state.reviews
+);
+
+
+
+
+
+const [
+selectedImage,
+setSelectedImage
+]=useState("");
+
+
+
+const [
+quantity,
+setQuantity
+]=useState(1);
+
+
+
+
+
+useEffect(()=>{
+
+
+dispatch(
+getSingleProduct(id)
+);
+
+
+},[
+dispatch,
+id
+]);
+
+
+
+
+useEffect(()=>{
+
+
+if(singleProduct?._id){
+
+
+dispatch(
+getProductReviews(
+singleProduct._id
+)
+);
+
+
+}
+
+
+},[
+singleProduct,
+dispatch
+]);
+
+
+
+
+// =====================================
+// SET PRODUCT MAIN IMAGE
+// =====================================
+
+useEffect(()=>{
+
 
 if(singleProduct){
+
 
 const image =
 singleProduct?.thumbnail?.url;
@@ -62,114 +198,367 @@ singleProduct?.thumbnail?.url;
 
 if(image && image.trim() !== ""){
 
+
 setSelectedImage(
 `http://localhost:5000/${image.replaceAll("\\","/")}`
 );
 
+
 }
 else{
 
-setSelectedImage("/no-image.png");
+
+setSelectedImage(
+"/no-image.png"
+);
+
 
 }
 
+
 }
 
-},[singleProduct]);
+
+},[
+singleProduct
+]);
 
 
 
-  if(loading || !singleProduct){
-
-    return <Loader/>;
-
-  }
 
 
+// =====================================
+// PRODUCT IMAGES
+// =====================================
 
- const productImages = [
 
-  singleProduct?.thumbnail?.url,
+const productImages = [
 
-  ...(singleProduct?.images || [])
-    .map(img => img.url)
+singleProduct?.thumbnail?.url,
 
-]
-
-.filter(
- img => img && img.trim() !== ""
+...(singleProduct?.images || [])
+.map(
+(img)=>img.url
 )
 
+]
+.filter(Boolean)
+
 .map(
- img =>
- `http://localhost:5000/${img.replaceAll("\\","/")}`
+(img)=>
+`http://localhost:5000/${img.replaceAll("\\","/")}`
+)
+
+
+.filter(
+img=>img && img.trim() !== ""
+)
+
+
+.map(
+img =>
+`http://localhost:5000/${img.replaceAll("\\","/")}`
 );
 
 
 
-  const discountPrice =
-    singleProduct.price -
-    (
-      singleProduct.price *
-      (singleProduct.discount || 0)
-    ) /
-    100;
 
 
 
-  const increaseQty = ()=>{
 
-    if(quantity < singleProduct.stock){
-
-      setQuantity(quantity+1);
-
-    }
-
-  };
+// =====================================
+// DISCOUNT PRICE
+// =====================================
 
 
-
-  const decreaseQty = ()=>{
-
-    if(quantity>1){
-
-      setQuantity(quantity-1);
-
-    }
-
-  };
+const discountPrice =
 
 
+singleProduct?.price -
 
-  const handleCart = ()=>{
+(
 
-    dispatch(
-      addToCart({
+singleProduct?.price *
 
-        productId:singleProduct._id,
+(singleProduct?.discount || 0)
 
-        quantity
+)
 
-      })
-    );
+/
 
-  };
+100;
 
 
 
-  const handleWishlist = ()=>{
-
-    dispatch(
-      addToWishlist(
-        singleProduct._id
-      )
-    );
-
-  };
 
 
 
-  return (
+
+// =====================================
+// QUANTITY
+// =====================================
+
+
+const increaseQty =()=>{
+
+
+if(
+quantity < singleProduct.stock
+){
+
+
+setQuantity(
+quantity + 1
+);
+
+
+}
+
+
+};
+
+
+
+
+
+const decreaseQty =()=>{
+
+
+if(quantity > 1){
+
+
+setQuantity(
+quantity - 1
+);
+
+
+}
+
+
+};
+
+
+
+
+
+
+
+// =====================================
+// ADD TO CART
+// =====================================
+
+
+const handleCart =()=>{
+
+
+dispatch(
+
+addToCart({
+
+productId:
+singleProduct._id,
+
+
+quantity
+
+})
+
+);
+
+
+
+toast.success(
+"Added to cart"
+);
+
+
+};
+
+
+
+
+
+
+
+
+// =====================================
+// ADD TO WISHLIST
+// =====================================
+
+
+const handleWishlist =()=>{
+
+
+dispatch(
+
+addWishlist(
+singleProduct._id
+)
+
+);
+
+
+toast.success(
+"Added to wishlist"
+);
+
+
+};
+
+
+
+
+
+
+
+
+
+// =====================================
+// SUBMIT REVIEW
+// =====================================
+
+
+const submitReview = async(data)=>{
+
+
+if(!user){
+
+toast.error(
+"Please login to submit review"
+);
+
+return;
+
+}
+
+
+try{
+
+
+await dispatch(
+
+createReview({
+
+productId:
+singleProduct._id,
+
+rating:data.rating,
+
+comment:data.comment
+
+})
+
+).unwrap();
+
+
+
+toast.success(
+"Review added successfully"
+);
+
+
+
+dispatch(
+getProductReviews(
+singleProduct._id
+)
+);
+
+
+
+}
+
+catch(error){
+
+
+toast.error(
+error || "Review failed"
+);
+
+
+}
+
+
+
+};
+
+
+
+
+
+
+
+
+// =====================================
+// DELETE REVIEW
+// =====================================
+
+
+const handleDeleteReview = async(reviewId)=>{
+
+
+try{
+
+
+await dispatch(
+
+deleteReview(reviewId)
+
+).unwrap();
+
+
+
+toast.success(
+"Review deleted"
+);
+
+
+
+dispatch(
+
+getProductReviews(
+singleProduct._id
+)
+
+);
+
+
+
+}
+
+catch(error){
+
+
+toast.error(
+error || "Delete failed"
+);
+
+
+}
+
+
+};
+
+
+
+
+
+// =====================================
+// LOADER
+// =====================================
+
+
+if(
+loading ||
+!singleProduct?._id
+){
+
+return <Loader/>;
+
+}
+
+
+return (
 
 <div className="bg-gray-100 min-h-screen py-10">
 
@@ -177,18 +566,28 @@ setSelectedImage("/no-image.png");
 <div className="max-w-7xl mx-auto px-5">
 
 
-{/* Product Main Section */}
+
+{/* ===============================
+        PRODUCT MAIN SECTION
+================================ */}
+
 
 <div className="bg-white rounded-xl shadow p-6 grid grid-cols-1 lg:grid-cols-2 gap-10">
 
 
 
-{/* IMAGE SECTION */}
+
+
+{/* ===============================
+        IMAGE GALLERY
+================================ */}
+
 
 <div>
 
 
 <div className="h-[450px] flex items-center justify-center">
+
 
 <img
 
@@ -196,12 +595,18 @@ src={
 selectedImage || "/no-image.png"
 }
 
-alt={singleProduct.title}
+alt={
+singleProduct.title
+}
 
 className="max-h-full object-contain"
 
 />
+
+
 </div>
+
+
 
 
 
@@ -209,7 +614,10 @@ className="max-h-full object-contain"
 
 
 {
-productImages.map((img,index)=>(
+
+productImages.map(
+
+(img,index)=>(
 
 
 <img
@@ -218,9 +626,18 @@ key={index}
 
 src={img}
 
+alt="product"
+
 onClick={()=>setSelectedImage(img)}
 
-className={`w-20 h-20 object-cover rounded-lg border cursor-pointer
+className={`
+w-20
+h-20
+object-cover
+rounded-lg
+border
+cursor-pointer
+
 ${
 selectedImage===img
 ?
@@ -228,12 +645,16 @@ selectedImage===img
 :
 ""
 }
+
 `}
 
 />
 
 
-))
+)
+
+)
+
 
 }
 
@@ -247,10 +668,16 @@ selectedImage===img
 
 
 
-{/* PRODUCT INFO */}
+
+
+
+{/* ===============================
+        PRODUCT INFORMATION
+================================ */}
 
 
 <div>
+
 
 
 <h1 className="text-3xl font-bold text-gray-800">
@@ -261,16 +688,25 @@ selectedImage===img
 
 
 
-<div className="flex items-center gap-3 mt-3">
+
+
+
+
+{/* Rating */}
+
+
+<div className="flex items-center gap-3 mt-4">
 
 
 <div className="flex text-yellow-500">
+
 
 {
 
 [1,2,3,4,5].map(
 
-star=>
+star=>(
+
 
 <Star
 
@@ -282,16 +718,26 @@ fill="currentColor"
 
 />
 
+
 )
 
+)
+
+
 }
+
 
 </div>
 
 
 <span className="text-gray-500">
 
-(120 Reviews)
+
+(
+{totalReviews}
+ Reviews
+)
+
 
 </span>
 
@@ -301,12 +747,23 @@ fill="currentColor"
 
 
 
+
+
+
+{/* Price */}
+
+
 <div className="mt-6">
 
 
 <span className="text-4xl font-bold text-blue-600">
 
-₹{Math.round(discountPrice)}
+
+₹
+{
+Math.round(discountPrice)
+}
+
 
 </span>
 
@@ -316,33 +773,44 @@ fill="currentColor"
 
 singleProduct.discount > 0 &&
 
+
 <span className="ml-4 text-xl line-through text-gray-400">
 
-₹{singleProduct.price}
+
+₹
+{
+singleProduct.price
+}
+
 
 </span>
+
 
 }
 
 
-
 </div>
 
 
 
 
 
-<div className="mt-5">
 
 
-<p className="text-gray-600">
+{/* Short Description */}
 
-{singleProduct.shortDescription}
+
+<p className="mt-5 text-gray-600">
+
+
+{
+singleProduct.shortDescription
+}
+
 
 </p>
 
 
-</div>
 
 
 
@@ -351,17 +819,24 @@ singleProduct.discount > 0 &&
 {/* Stock */}
 
 
-<div className="mt-5">
+<div className="mt-6">
 
 
 {
 
-singleProduct.stock > 0 ?
+singleProduct.stock > 0
+
+
+?
 
 
 <p className="text-green-600 font-semibold">
 
-✔ In Stock ({singleProduct.stock})
+✔ In Stock (
+{
+singleProduct.stock
+}
+)
 
 </p>
 
@@ -385,23 +860,26 @@ Out Of Stock
 
 
 
+
+
 {/* Quantity */}
 
 
-<div className="flex items-center gap-4 mt-7">
+<div className="flex items-center gap-5 mt-7">
 
 
 <button
 
 onClick={decreaseQty}
 
-className="p-2 border rounded"
+className="p-2 border rounded-lg hover:bg-gray-100"
 
 >
 
 <Minus size={18}/>
 
 </button>
+
 
 
 
@@ -413,11 +891,13 @@ className="p-2 border rounded"
 
 
 
+
+
 <button
 
 onClick={increaseQty}
 
-className="p-2 border rounded"
+className="p-2 border rounded-lg hover:bg-gray-100"
 
 >
 
@@ -426,28 +906,54 @@ className="p-2 border rounded"
 </button>
 
 
+
 </div>
 
 
 
 
 
-{/* Buttons */}
+
+
+
+
+{/* ACTION BUTTONS */}
 
 
 <div className="flex gap-4 mt-8">
 
 
+
 <button
+
 
 onClick={handleCart}
 
-className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg flex justify-center items-center gap-2"
+
+disabled={
+singleProduct.stock===0
+}
+
+
+className="
+flex-1
+bg-blue-600
+hover:bg-blue-700
+text-white
+py-3
+rounded-lg
+flex
+justify-center
+items-center
+gap-2
+"
+
 
 >
 
 
 <ShoppingCart/>
+
 
 Add To Cart
 
@@ -457,17 +963,31 @@ Add To Cart
 
 
 
+
+
+
 <button
+
 
 onClick={handleWishlist}
 
-className="px-5 border rounded-lg hover:bg-red-50"
+
+className="
+px-5
+border
+rounded-lg
+hover:bg-red-50
+"
+
 
 >
 
+
 <Heart className="text-red-500"/>
 
+
 </button>
+
 
 
 
@@ -477,15 +997,22 @@ className="px-5 border rounded-lg hover:bg-red-50"
 
 
 
-{/* Benefits */}
+
+
+
+
+{/* BENEFITS */}
 
 
 <div className="grid grid-cols-3 gap-4 mt-10">
 
 
+
 <div className="text-center">
 
+
 <Truck className="mx-auto text-blue-600"/>
+
 
 <p className="text-sm">
 
@@ -493,13 +1020,18 @@ Free Delivery
 
 </p>
 
+
 </div>
+
+
 
 
 
 <div className="text-center">
 
+
 <ShieldCheck className="mx-auto text-green-600"/>
+
 
 <p className="text-sm">
 
@@ -507,13 +1039,18 @@ Secure Payment
 
 </p>
 
+
 </div>
+
+
 
 
 
 <div className="text-center">
 
+
 <Heart className="mx-auto text-red-500"/>
+
 
 <p className="text-sm">
 
@@ -521,8 +1058,6 @@ Wishlist
 
 </p>
 
-</div>
-
 
 </div>
 
@@ -531,6 +1066,12 @@ Wishlist
 </div>
 
 
+
+
+
+</div>
+
+
 </div>
 
 
@@ -539,7 +1080,13 @@ Wishlist
 
 
 
-{/* Description */}
+
+
+
+{/* ===============================
+        DESCRIPTION
+================================ */}
+
 
 
 <div className="bg-white rounded-xl shadow p-6 mt-8">
@@ -547,16 +1094,24 @@ Wishlist
 
 <h2 className="text-2xl font-bold mb-4">
 
+
 Product Description
+
 
 </h2>
 
 
+
 <p className="text-gray-600 leading-7">
 
-{singleProduct.description}
+
+{
+singleProduct.description
+}
+
 
 </p>
+
 
 
 </div>
@@ -567,46 +1122,84 @@ Product Description
 
 
 
-{/* Related Products */}
 
 
-<div className="mt-10">
+{/* ===============================
+        REVIEW SECTION
+================================ */}
 
 
-<h2 className="text-2xl font-bold mb-5">
 
-Related Products
+<div className="bg-white rounded-xl shadow p-6 mt-8">
+
+
+<h2 className="text-2xl font-bold mb-6">
+
+Customer Reviews
 
 </h2>
 
 
 
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
 
 
-{
-
-products
-
-?.filter(
-item=>item._id!==singleProduct._id
-)
-
-.slice(0,4)
-
-.map(product=>(
+<ReviewSummary
 
 
-<ProductCard
+averageRating={
+averageRating
+}
 
-key={product._id}
 
-product={product}
+totalReviews={
+totalReviews
+}
+
 
 />
 
 
-))
+
+
+
+
+
+
+<div className="mt-8">
+
+
+{
+
+user ?
+
+
+<ReviewForm
+
+
+onSubmit={
+submitReview
+}
+
+
+loading={
+reviewLoading
+}
+
+
+/>
+
+
+
+:
+
+
+<div className="border rounded-lg p-5 text-gray-600">
+
+
+Please login to write a review.
+
+
+</div>
 
 
 }
@@ -615,6 +1208,126 @@ product={product}
 </div>
 
 
+
+
+
+
+
+
+<div className="mt-8">
+
+
+<ReviewList
+
+
+reviews={
+reviews
+}
+
+
+user={
+user
+}
+
+
+onDelete={
+handleDeleteReview
+}
+
+
+/>
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* ===============================
+        RELATED PRODUCTS
+================================ */}
+
+
+
+<div className="mt-10">
+
+
+<h2 className="text-2xl font-bold mb-5">
+
+
+Related Products
+
+
+</h2>
+
+
+
+
+
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+
+
+
+{
+
+
+products
+
+?.filter(
+
+item=>
+
+item._id !== singleProduct._id
+
+)
+
+
+.slice(0,4)
+
+
+.map(
+
+product=>(
+
+
+<ProductCard
+
+
+key={
+product._id
+}
+
+
+product={
+product
+}
+
+
+/>
+
+
+)
+
+)
+
+
+
+}
+
+
+
 </div>
 
 
@@ -622,11 +1335,18 @@ product={product}
 </div>
 
 
+
+
+
 </div>
 
-  );
+
+</div>
+
+
+);
+
 
 };
-
 
 export default ProductDetails;

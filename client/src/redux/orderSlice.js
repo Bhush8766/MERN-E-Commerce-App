@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import {
-  createOrderApi,
+  createOrderAPI,
   getMyOrdersApi,
   getOrderDetailsAPI,
   cancelOrderApi,
@@ -14,17 +14,29 @@ import {
 // CREATE ORDER
 // ==========================================
 export const createOrder = createAsyncThunk(
-  "orders/createOrder",
-  async (orderData, { rejectWithValue }) => {
-    try {
-      return await createOrderApi(orderData);
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message ||
-          "Failed to create order"
-      );
+    "orders/createOrder",
+
+    async(orderData,{rejectWithValue})=>{
+
+        try{
+
+            const response =
+                await createOrderAPI(orderData);
+
+
+            return response.data;
+
+        }
+        catch(error){
+
+            return rejectWithValue(
+                error.response?.data?.message ||
+                "Order failed"
+            );
+
+        }
+
     }
-  }
 );
 
 // ==========================================
@@ -131,10 +143,12 @@ export const deleteOrder = createAsyncThunk(
 );
 
 const initialState = {
-  orders: [],
-  order: null,
-  loading: false,
-  error: null,
+
+    orders:[],
+    order:null,
+    loading:false,
+    error:null
+
 };
 
 const orderSlice = createSlice({

@@ -4,15 +4,15 @@ import axiosInstance from "./axiosInstance";
 // CREATE ORDER
 // POST /api/orders/create
 // ==========================================
-export const createOrderApi = async (orderData) => {
-  const { data } = await axiosInstance.post(
-    "/orders/create",
-    orderData
-  );
 
-  return data;
+export const createOrderAPI = (data)=>{
+
+    return axiosInstance.post(
+        "/orders/create",
+        data
+    );
+
 };
-
 // ==========================================
 // GET MY ORDERS
 // GET /api/orders/my-orders

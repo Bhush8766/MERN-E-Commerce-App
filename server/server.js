@@ -28,8 +28,12 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 
+const invoiceRoutes =
+require("./routes/invoiceRoutes");
+
 const adminRoutes =
 require("./routes/adminRoute");
+
 
 
 
@@ -188,6 +192,8 @@ app.use(
     paymentRoutes
 );
 
+app.use("/api/orders/payment", paymentRoutes);
+
 
 app.use(
     "/api/upload",
@@ -201,7 +207,10 @@ app.use(
 );
 
 
-
+app.use(
+"/api/invoice",
+invoiceRoutes
+);
 
 // ===============================
 // Home Route

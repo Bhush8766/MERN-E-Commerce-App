@@ -1,8 +1,7 @@
 import {
-    Routes,
-    Route
+  Routes,
+  Route,
 } from "react-router-dom";
-
 
 import {
     useEffect
@@ -103,6 +102,12 @@ import ChangePassword from "./pages/ChangePassword";
 
 import Address from "./pages/SavedAddresses"
 
+import AddressSelector from "./pages/AddressSelector";
+
+
+import Payment from "./pages/Payment";
+
+import OrderManagement from "./admin/OrderManagement";
 
 
 
@@ -199,9 +204,27 @@ element={
 </ProtectedRoute>
 
 }
-
 />
 
+
+
+<Route
+ path="/payment"
+ element={
+   <Payment />
+ }
+/>
+
+
+
+<Route
+  path="/checkout/address"
+  element={
+    <ProtectedRoute>
+      <AddressSelector />
+    </ProtectedRoute>
+  }
+/>
 
 
 <Route
@@ -221,6 +244,11 @@ element={
 />
 
 
+<Route
+path="/order/:id"
+element={<OrderDetails />}
+/>
+
 
 <Route
  path="/change-password"
@@ -235,6 +263,24 @@ element={
     </ProtectedRoute>
   }
 />
+
+<Route
+
+path="/admin/orders"
+
+element={
+
+<AdminRoute>
+
+<OrderManagement/>
+
+</AdminRoute>
+
+}
+
+/>
+
+
 
 </Route>
 
@@ -329,6 +375,17 @@ element={
 />
 
 
+<Route
+path="/payment-success/:id"
+element={<PaymentSuccess />}
+/>
+
+
+
+<Route
+path="/payment-failed/:id"
+element={<PaymentFailed />}
+/>
 
 
 
@@ -353,9 +410,9 @@ element={
 
 }
 
-
-
 >
+
+
 
 
 {/* 

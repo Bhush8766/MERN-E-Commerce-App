@@ -24,13 +24,20 @@ const authorize = require("../middleware/roleMiddleware");
 // CUSTOMER ROUTES
 // ===========================================
 
-// Create Order (COD)
+
 router.post(
-  "/create",
-  protect,
-  authorize("Customer", "Admin"),
-  createOrder
+    "/create",
+    protect,
+    createOrder
 );
+
+// Create Order (COD)
+// router.post(
+//   "/create",
+//   protect,
+//   authorize("Customer", "Admin"),
+//   createOrder
+// );
 
 // Get Logged-in User Orders
 router.get(

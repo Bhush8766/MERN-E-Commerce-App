@@ -1,50 +1,162 @@
-import { Link } from "react-router-dom";
-import { XCircle, RotateCcw, ShoppingCart } from "lucide-react";
+import {
+  XCircle,
+  RotateCcw,
+  ShoppingCart,
+} from "lucide-react";
 
-function PaymentFailed() {
-  return (
-    <div className="min-h-screen bg-red-50 flex items-center justify-center px-4">
 
-      <div className="bg-white rounded-2xl shadow-xl p-10 max-w-lg w-full text-center">
+import {
+Link,
+useParams
+} from "react-router-dom";
 
-        <XCircle
-          size={90}
-          className="mx-auto text-red-600"
-        />
 
-        <h1 className="text-4xl font-bold mt-6 text-red-600">
-          Payment Failed
-        </h1>
 
-        <p className="text-gray-600 mt-4 leading-7">
-          Unfortunately, we couldn't complete your payment.
-          Please try again or choose another payment method.
-        </p>
+const PaymentFailed =()=>{
 
-        <div className="mt-8 space-y-4">
 
-          <Link
-            to="/checkout"
-            className="w-full flex justify-center items-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold transition"
-          >
-            <RotateCcw size={20} />
-            Retry Payment
-          </Link>
+const {id}=useParams();
 
-          <Link
-            to="/cart"
-            className="w-full flex justify-center items-center gap-2 border border-red-600 text-red-600 hover:bg-red-50 py-3 rounded-lg font-semibold transition"
-          >
-            <ShoppingCart size={20} />
-            Back to Cart
-          </Link>
 
-        </div>
 
-      </div>
+return (
 
-    </div>
-  );
-}
+<div className="
+min-h-screen
+bg-gray-50
+flex
+items-center
+justify-center
+px-6
+">
+
+
+<div className="
+bg-white
+shadow-lg
+rounded-2xl
+p-10
+max-w-md
+w-full
+text-center
+">
+
+
+
+<XCircle
+
+size={80}
+
+className="
+mx-auto
+text-red-600
+mb-6
+"
+
+/>
+
+
+
+<h1 className="
+text-3xl
+font-bold
+mb-3
+">
+
+Payment Failed ❌
+
+</h1>
+
+
+
+
+<p className="
+text-gray-600
+mb-6
+">
+
+Your payment could not be completed.
+
+Please try again.
+
+</p>
+
+
+
+
+<div className="
+space-y-3
+">
+
+
+<Link
+
+to="/checkout"
+
+className="
+flex
+justify-center
+items-center
+gap-2
+bg-blue-600
+text-white
+py-3
+rounded-xl
+"
+
+>
+
+
+<RotateCcw size={20}/>
+
+Retry Payment
+
+</Link>
+
+
+
+
+<Link
+
+to="/cart"
+
+className="
+flex
+justify-center
+items-center
+gap-2
+border
+py-3
+rounded-xl
+"
+
+>
+
+
+<ShoppingCart size={20}/>
+
+Go To Cart
+
+
+</Link>
+
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+);
+
+
+};
+
+
 
 export default PaymentFailed;

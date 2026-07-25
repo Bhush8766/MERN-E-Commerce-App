@@ -10,8 +10,10 @@ import categoryReducer from "./categorySlice";
 import brandReducer from "./brandSlice";
 import userReducer from "./userSlice";
 import dashboardReducer from "./dashboardSlice";
+import checkoutReducer from "./checkoutSlice";
 
-
+import reviewReducer
+from "./reviewSlice";
 
 
 
@@ -45,6 +47,11 @@ const store = configureStore({
 
     // Dashboard
     dashboard: dashboardReducer,
+
+
+    checkout: checkoutReducer,
+
+    review: reviewReducer
   },
 });
 

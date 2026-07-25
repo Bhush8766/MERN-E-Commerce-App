@@ -1,227 +1,401 @@
-const asyncHandler = require("express-async-handler");
-const Review = require("../models/reviewModel");
-const Product = require("../models/productModel");
+const asyncHandler =
+require("express-async-handler");
 
-// ==============================================
-// Add Review
-// POST /api/reviews
-// ==============================================
-exports.addReview = asyncHandler(async (req, res) => {
-  const { productId, rating, comment } = req.body;
 
-  if (!productId || !rating || !comment) {
-    return res.status(400).json({
-      success: false,
-      message: "All fields are required",
-    });
-  }
+const Review =
+require("../models/reviewModel");
 
-  const product = await Product.findById(productId);
 
-  if (!product) {
-    return res.status(404).json({
-      success: false,
-      message: "Product not found",
-    });
-  }
+const Product =
+require("../models/productModel");
 
-  const alreadyReviewed = await Review.findOne({
-    user: req.user.id,
-    product: productId,
-  });
 
-  if (alreadyReviewed) {
-    return res.status(400).json({
-      success: false,
-      message: "You have already reviewed this product",
-    });
-  }
+const Order =
+require("../models/orderModel");
 
-  const review = await Review.create({
-    user: req.user.id,
-    product: productId,
 
-    // ADD THESE
-    name: req.user.name,
-    avatar: req.user.avatar,
 
-    rating,
-    comment,
-  });
-
-  // Update Product Rating
-  const reviews = await Review.find({ product: productId });
-
-  const average =
-    reviews.reduce((sum, item) => sum + item.rating, 0) /
-    reviews.length;
-
-  product.rating = average;
-  product.numReviews = reviews.length;
-
-  await product.save();
-
-  res.status(201).json({
-    success: true,
-    message: "Review added successfully",
-    review,
-  });
-});
-
-// ==============================================
-// Get Product Reviews
+// ==========================================
+// GET PRODUCT REVIEWS
 // GET /api/reviews/product/:productId
-// ==============================================
-exports.getProductReviews = asyncHandler(async (req, res) => {
-  const reviews = await Review.find({
-    product: req.params.productId,
-  })
-    .populate("user", "name email")
-    .sort({ createdAt: -1 });
+// ==========================================
 
-  res.status(200).json({
-    success: true,
-    totalReviews: reviews.length,
-    reviews,
-  });
+exports.getProductReviews =
+asyncHandler(async(req,res)=>{
+
+
+const reviews =
+await Review.find({
+
+product:req.params.productId
+
+})
+.populate(
+"user",
+"name"
+)
+.sort({
+createdAt:-1
 });
 
-// ==============================================
-// Get Single Review
-// GET /api/reviews/:id
-// ==============================================
-exports.getReviewById = asyncHandler(async (req, res) => {
-  const review = await Review.findById(req.params.id)
-    .populate("user", "name email")
-    .populate("product", "title images");
 
-  if (!review) {
-    return res.status(404).json({
-      success: false,
-      message: "Review not found",
-    });
-  }
 
-  res.status(200).json({
-    success: true,
-    review,
-  });
+const product =
+await Product.findById(
+req.params.productId
+);
+
+
+
+res.status(200).json({
+
+success:true,
+
+reviews,
+
+averageRating:
+product.rating,
+
+totalReviews:
+product.numReviews
+
+
 });
 
-// ==============================================
-// Update Review
-// ==============================================
-exports.updateReview = asyncHandler(async (req, res) => {
-  const { rating, comment } = req.body;
 
-  const review = await Review.findById(req.params.id);
-
-  if (!review) {
-    return res.status(404).json({
-      success: false,
-      message: "Review not found",
-    });
-  }
-
-  if (review.user.toString() !== req.user.id) {
-    return res.status(403).json({
-      success: false,
-      message: "Not authorized",
-    });
-  }
-
-  review.rating = rating || review.rating;
-  review.comment = comment || review.comment;
-
-  await review.save();
-
-  res.status(200).json({
-    success: true,
-    message: "Review updated successfully",
-    review,
-  });
 });
 
-// ==============================================
-// Delete Review
-// ==============================================
-exports.deleteReview = asyncHandler(async (req, res) => {
-  const review = await Review.findById(req.params.id);
 
-  if (!review) {
-    return res.status(404).json({
-      success: false,
-      message: "Review not found",
-    });
-  }
 
-  await review.deleteOne();
 
-  res.status(200).json({
-    success: true,
-    message: "Review deleted successfully",
-  });
+
+// ==========================================
+// CREATE REVIEW
+// POST /api/reviews
+// ==========================================
+
+exports.createReview =
+asyncHandler(async(req,res)=>{
+
+
+const {
+productId,
+rating,
+comment
+}=req.body;
+
+
+
+const existingReview =
+await Review.findOne({
+
+product:productId,
+
+user:req.user.id
+
 });
 
-// ==============================================
-// Get All Reviews
-// ==============================================
-exports.getAllReviews = asyncHandler(async (req, res) => {
-  const reviews = await Review.find()
-    .populate("user", "name email")
-    .populate("product", "title");
 
-  res.status(200).json({
-    success: true,
-    totalReviews: reviews.length,
-    reviews,
-  });
+
+if(existingReview){
+
+return res.status(400).json({
+
+success:false,
+
+message:
+"You already reviewed this product"
+
 });
 
-// ==============================================
-// Approve Review
-// ==============================================
-exports.approveReview = asyncHandler(async (req, res) => {
-  const review = await Review.findById(req.params.id);
+}
 
-  if (!review) {
-    return res.status(404).json({
-      success: false,
-      message: "Review not found",
-    });
-  }
 
-  review.status = "Approved";
 
-  await review.save();
 
-  res.status(200).json({
-    success: true,
-    message: "Review approved successfully",
-    review,
-  });
+
+let verified=false;
+
+
+
+const order =
+await Order.findOne({
+
+user:req.user.id,
+
+"products.product":productId,
+
+orderStatus:"Delivered"
+
 });
 
-// ==============================================
-// Reject Review
-// ==============================================
-exports.rejectReview = asyncHandler(async (req, res) => {
-  const review = await Review.findById(req.params.id);
 
-  if (!review) {
-    return res.status(404).json({
-      success: false,
-      message: "Review not found",
-    });
-  }
 
-  review.status = "Rejected";
+if(order){
 
-  await review.save();
+verified=true;
 
-  res.status(200).json({
-    success: true,
-    message: "Review rejected successfully",
-    review,
-  });
+}
+
+
+
+
+const review =
+await Review.create({
+
+user:req.user.id,
+
+product:productId,
+
+name:req.user.name,
+
+rating,
+
+comment,
+
+isVerifiedPurchase:
+verified
+
 });
+
+
+
+
+
+await updateProductRating(
+productId
+);
+
+
+
+res.status(201).json({
+
+success:true,
+
+review
+
+});
+
+
+});
+
+
+
+
+
+
+// ==========================================
+// UPDATE REVIEW
+// PATCH /api/reviews/:id
+// ==========================================
+
+exports.updateReview =
+asyncHandler(async(req,res)=>{
+
+
+const review =
+await Review.findById(
+req.params.id
+);
+
+
+
+if(!review){
+
+return res.status(404).json({
+
+success:false,
+
+message:"Review not found"
+
+});
+
+}
+
+
+
+if(
+review.user.toString()
+!== req.user.id
+){
+
+return res.status(403).json({
+
+success:false,
+
+message:"Not allowed"
+
+});
+
+}
+
+
+
+
+review.rating =
+req.body.rating || review.rating;
+
+
+review.comment =
+req.body.comment || review.comment;
+
+
+
+await review.save();
+
+
+
+await updateProductRating(
+review.product
+);
+
+
+
+res.status(200).json({
+
+success:true,
+
+review
+
+});
+
+
+});
+
+
+
+
+
+
+
+// ==========================================
+// DELETE REVIEW
+// DELETE /api/reviews/:id
+// ==========================================
+
+exports.deleteReview =
+asyncHandler(async(req,res)=>{
+
+
+const review =
+await Review.findById(
+req.params.id
+);
+
+
+
+if(!review){
+
+return res.status(404).json({
+
+success:false,
+
+message:"Review not found"
+
+});
+
+}
+
+
+
+if(
+review.user.toString()
+!== req.user.id
+){
+
+return res.status(403).json({
+
+success:false,
+
+message:"Not allowed"
+
+});
+
+}
+
+
+
+await review.deleteOne();
+
+
+
+await updateProductRating(
+review.product
+);
+
+
+
+res.status(200).json({
+
+success:true,
+
+message:
+"Review deleted"
+
+});
+
+
+});
+
+
+
+
+
+
+
+// ==========================================
+// UPDATE PRODUCT RATING HELPER
+// ==========================================
+
+async function updateProductRating(productId){
+
+
+const reviews =
+await Review.find({
+
+product:productId
+
+});
+
+
+
+const total =
+reviews.length;
+
+
+
+const avg =
+total===0
+?
+0
+:
+reviews.reduce(
+
+(sum,item)=>
+
+sum + item.rating,
+
+0
+
+)/total;
+
+
+
+await Product.findByIdAndUpdate(
+
+productId,
+
+{
+
+rating:
+avg.toFixed(1),
+
+numReviews:
+total
+
+}
+
+);
+
+
+}
