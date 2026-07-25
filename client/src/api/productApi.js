@@ -1,17 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
-
-export const getProducts = createAsyncThunk(
-  "products/getProducts",
-  async () => {
-    const response = await axiosInstance.get("/products");
-
-    console.log("API Response:", response.data);
-
-    return response.data;
-  }
-);
+// ===============================
+// Get All Products
+// ===============================
+export const getProductsApi = async (params = {}) => {
+  const { data } = await axiosInstance.get("/products", { params });
+  return data;
+};
 
 // ===============================
 // Get Single Product
@@ -39,12 +36,12 @@ const productSlice = createSlice({
 
     builder
 
-    .addCase(getProducts.pending,(state)=>{
+    .addCase(getProductsApi.pending,(state)=>{
       state.loading=true;
     })
 
 
-    .addCase(getProducts.fulfilled,(state,action)=>{
+    .addCase(getProductsApi.fulfilled,(state,action)=>{
 
       state.loading=false;
       state.products=action.payload;

@@ -92,6 +92,13 @@ import UserList from "./admin/users/UserList";
 
 import OrderList from "./admin/orders/OrderList";
 
+import OrderDetails from "./pages/OrderDetails";
+
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailed from "./pages/PaymentFailed";
+
+
+
 
 
 
@@ -173,14 +180,47 @@ element={<Cart />}
 
 
 
-</Route>
+<Route
+
+path="/checkout"
+
+element={
+
+<ProtectedRoute>
+
+<Checkout />
+
+</ProtectedRoute>
+
+}
+
+/>
 
 
 
 <Route
-  path="/wishlist"
-  element={<Wishlist />}
+path="/wishlist"
+element={
+<ProtectedRoute>
+<Wishlist />
+</ProtectedRoute>
+}
 />
+
+
+
+<Route
+  path="/orders/:id"
+  element={<OrderDetails />}
+/>
+
+
+
+</Route>
+
+
+
+
 
 
 
@@ -233,26 +273,12 @@ element={
 
 
 
-<Route
-
-path="/checkout"
-
-element={
-
-<ProtectedRoute>
-
-<Checkout />
-
-</ProtectedRoute>
-
-}
-
-/>
 
 
 
 
-<Route
+
+{/* <Route
 
 path="/orders"
 
@@ -266,11 +292,21 @@ element={
 
 }
 
+/> */}
+
+
+<Route path="/my-orders" element={<MyOrders />} />
+
+
+<Route
+  path="/payment-success"
+  element={<PaymentSuccess />}
 />
 
-
-
-
+<Route
+  path="/payment-failed"
+  element={<PaymentFailed />}
+/>
 
 
 
@@ -461,6 +497,9 @@ element={<UserList />}
 
 
 </Route>
+
+
+
 
 
 

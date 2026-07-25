@@ -1,142 +1,244 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams, Link } from "react-router-dom";
 
-import { getSingleProduct, getProducts } from "../redux/productSlice";
+import {
+  ShoppingCart,
+  Heart,
+  Star,
+  Truck,
+  ShieldCheck,
+  Minus,
+  Plus,
+} from "lucide-react";
 
+import { getSingleProduct } from "../redux/productSlice";
 import { addToCart } from "../redux/cartSlice";
 import { addWishlist } from "../redux/wishlistSlice";
 
+import Loader from "../components/Loader";
 import ProductCard from "../components/ProductCard";
 
 
-
 const ProductDetails = () => {
-
 
   const { id } = useParams();
 
   const dispatch = useDispatch();
 
 
-
-  const [quantity,setQuantity] = useState(1);
-
-
-
-
-const {
-  selectedProduct,
-  products,
+  const {
+  singleProduct,
   loading,
-} = useSelector((state) => state.product);
+  products
+} = useSelector(
+  (state)=>state.product
+);
 
-const product = selectedProduct;
-
-
-
-
-
-
-  useEffect(()=>{
+  const [selectedImage, setSelectedImage] = useState("");
+  const [quantity, setQuantity] = useState(1);
 
 
-   dispatch(getSingleProduct(id));
 
-    dispatch(getProducts());
+  // Fetch Product
+  useEffect(() => {
 
+    if(id){
+      dispatch(getSingleProduct(id));
+    }
 
   },[dispatch,id]);
 
 
 
+  // Set Main Image
+ useEffect(()=>{
+
+if(singleProduct){
+
+const image =
+singleProduct?.thumbnail?.url;
+
+
+if(image && image.trim() !== ""){
+
+setSelectedImage(
+`http://localhost:5000/${image.replaceAll("\\","/")}`
+);
+
+}
+else{
+
+setSelectedImage("/no-image.png");
+
+}
+
+}
+
+},[singleProduct]);
 
 
 
+  if(loading || !singleProduct){
 
-
-  if(!product)
-  {  
-    
-    return (
-
-      <div className="text-center py-20 text-xl">
-
-        Loading Product...
-
-      </div>
-
-    );
+    return <Loader/>;
 
   }
 
 
 
+ const productImages = [
+
+  singleProduct?.thumbnail?.url,
+
+  ...(singleProduct?.images || [])
+    .map(img => img.url)
+
+]
+
+.filter(
+ img => img && img.trim() !== ""
+)
+
+.map(
+ img =>
+ `http://localhost:5000/${img.replaceAll("\\","/")}`
+);
 
 
 
-
-
-  const image = product.thumbnail?.url
-
-  ?
-
-  `http://localhost:5000/${product.thumbnail.url.replace(/\\/g,"/")}`
-
-  :
-
-  "/no-image.png";
+  const discountPrice =
+    singleProduct.price -
+    (
+      singleProduct.price *
+      (singleProduct.discount || 0)
+    ) /
+    100;
 
 
 
+  const increaseQty = ()=>{
+
+    if(quantity < singleProduct.stock){
+
+      setQuantity(quantity+1);
+
+    }
+
+  };
 
 
+
+  const decreaseQty = ()=>{
+
+    if(quantity>1){
+
+      setQuantity(quantity-1);
+
+    }
+
+  };
+
+
+
+  const handleCart = ()=>{
+
+    dispatch(
+      addToCart({
+
+        productId:singleProduct._id,
+
+        quantity
+
+      })
+    );
+
+  };
+
+
+
+  const handleWishlist = ()=>{
+
+    dispatch(
+      addToWishlist(
+        singleProduct._id
+      )
+    );
+
+  };
 
 
 
   return (
 
+<div className="bg-gray-100 min-h-screen py-10">
 
 
-<div className="bg-gray-50 min-h-screen">
+<div className="max-w-7xl mx-auto px-5">
 
 
+{/* Product Main Section */}
 
-
-
-<div className="max-w-7xl mx-auto px-6 py-12">
-
-
-
-
-
-{/* PRODUCT MAIN SECTION */}
+<div className="bg-white rounded-xl shadow p-6 grid grid-cols-1 lg:grid-cols-2 gap-10">
 
 
 
-<div className="bg-white rounded-3xl shadow p-8 grid md:grid-cols-2 gap-10">
-
-
-
-
-
-
-{/* IMAGE */}
-
-
+{/* IMAGE SECTION */}
 
 <div>
 
 
+<div className="h-[450px] flex items-center justify-center">
+
 <img
 
-src={image}
+src={
+selectedImage || "/no-image.png"
+}
 
-alt={product.title}
+alt={singleProduct.title}
 
-className="w-full h-[500px] object-cover rounded-2xl"
+className="max-h-full object-contain"
 
 />
+</div>
+
+
+
+<div className="flex gap-4 mt-5 overflow-x-auto">
+
+
+{
+productImages.map((img,index)=>(
+
+
+<img
+
+key={index}
+
+src={img}
+
+onClick={()=>setSelectedImage(img)}
+
+className={`w-20 h-20 object-cover rounded-lg border cursor-pointer
+${
+selectedImage===img
+?
+"border-blue-600"
+:
+""
+}
+`}
+
+/>
+
+
+))
+
+}
+
+
+</div>
 
 
 </div>
@@ -145,42 +247,82 @@ className="w-full h-[500px] object-cover rounded-2xl"
 
 
 
-
-
-{/* DETAILS */}
-
+{/* PRODUCT INFO */}
 
 
 <div>
 
 
+<h1 className="text-3xl font-bold text-gray-800">
 
-<h1 className="text-4xl font-bold">
-
-{product.title}
+{singleProduct.title}
 
 </h1>
 
 
 
+<div className="flex items-center gap-3 mt-3">
 
 
-<div className="flex gap-3 mt-4">
+<div className="flex text-yellow-500">
+
+{
+
+[1,2,3,4,5].map(
+
+star=>
+
+<Star
+
+key={star}
+
+size={20}
+
+fill="currentColor"
+
+/>
+
+)
+
+}
+
+</div>
 
 
-<span className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full">
+<span className="text-gray-500">
 
-{product.category?.name || "Category"}
+(120 Reviews)
+
+</span>
+
+
+</div>
+
+
+
+
+<div className="mt-6">
+
+
+<span className="text-4xl font-bold text-blue-600">
+
+₹{Math.round(discountPrice)}
 
 </span>
 
 
 
-<span className="bg-gray-100 px-4 py-2 rounded-full">
+{
 
-{product.brand?.name || "Brand"}
+singleProduct.discount > 0 &&
+
+<span className="ml-4 text-xl line-through text-gray-400">
+
+₹{singleProduct.price}
 
 </span>
+
+}
 
 
 
@@ -190,72 +332,76 @@ className="w-full h-[500px] object-cover rounded-2xl"
 
 
 
+<div className="mt-5">
 
 
+<p className="text-gray-600">
 
-<h2 className="text-4xl font-bold text-blue-600 mt-8">
-
-₹{product.price}
-
-</h2>
-
-
-
-
-
-
-<p className="text-green-600 font-bold mt-3">
-
-✓ In Stock
+{singleProduct.shortDescription}
 
 </p>
 
 
+</div>
 
 
 
 
 
+{/* Stock */}
 
 
-<p className="mt-6 text-gray-600 leading-7">
+<div className="mt-5">
 
 
-{product.description || 
+{
 
-"Premium quality product with amazing features."}
+singleProduct.stock > 0 ?
 
+
+<p className="text-green-600 font-semibold">
+
+✔ In Stock ({singleProduct.stock})
 
 </p>
 
 
+:
+
+
+<p className="text-red-600 font-semibold">
+
+Out Of Stock
+
+</p>
+
+
+}
+
+
+</div>
 
 
 
 
 
+{/* Quantity */}
 
 
-{/* QUANTITY */}
-
-
-<div className="flex items-center gap-5 mt-8">
+<div className="flex items-center gap-4 mt-7">
 
 
 <button
 
-onClick={()=>setQuantity(
-Math.max(1,quantity-1)
-)}
+onClick={decreaseQty}
 
-className="border px-4 py-2 rounded-lg"
+className="p-2 border rounded"
 
 >
 
--
+<Minus size={18}/>
 
 </button>
-
 
 
 
@@ -267,20 +413,17 @@ className="border px-4 py-2 rounded-lg"
 
 
 
-
-
 <button
 
-onClick={()=>setQuantity(quantity+1)}
+onClick={increaseQty}
 
-className="border px-4 py-2 rounded-lg"
+className="p-2 border rounded"
 
 >
 
-+
+<Plus size={18}/>
 
 </button>
-
 
 
 </div>
@@ -289,49 +432,24 @@ className="border px-4 py-2 rounded-lg"
 
 
 
-
-
-
-
-{/* ACTION BUTTONS */}
-
+{/* Buttons */}
 
 
 <div className="flex gap-4 mt-8">
 
 
-
-
-
 <button
 
+onClick={handleCart}
 
-onClick={()=>{
-
-
-dispatch(
-
-addToCart({
-
-...product,
-
-quantity
-
-})
-
-)
-
-
-}}
-
-
-
-className="flex-1 bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700"
+className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg flex justify-center items-center gap-2"
 
 >
 
 
-🛒 Add To Cart
+<ShoppingCart/>
+
+Add To Cart
 
 
 </button>
@@ -339,29 +457,79 @@ className="flex-1 bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue
 
 
 
-
-
-
-
 <button
 
+onClick={handleWishlist}
 
-onClick={()=>dispatch(addWishlist(product._id))}
-
-
-
-className="px-6 border rounded-xl text-2xl hover:bg-red-50"
-
+className="px-5 border rounded-lg hover:bg-red-50"
 
 >
 
-❤️
-
+<Heart className="text-red-500"/>
 
 </button>
 
 
 
+</div>
+
+
+
+
+
+{/* Benefits */}
+
+
+<div className="grid grid-cols-3 gap-4 mt-10">
+
+
+<div className="text-center">
+
+<Truck className="mx-auto text-blue-600"/>
+
+<p className="text-sm">
+
+Free Delivery
+
+</p>
+
+</div>
+
+
+
+<div className="text-center">
+
+<ShieldCheck className="mx-auto text-green-600"/>
+
+<p className="text-sm">
+
+Secure Payment
+
+</p>
+
+</div>
+
+
+
+<div className="text-center">
+
+<Heart className="mx-auto text-red-500"/>
+
+<p className="text-sm">
+
+Wishlist
+
+</p>
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
 
 </div>
 
@@ -371,30 +539,41 @@ className="px-6 border rounded-xl text-2xl hover:bg-red-50"
 
 
 
+{/* Description */}
+
+
+<div className="bg-white rounded-xl shadow p-6 mt-8">
+
+
+<h2 className="text-2xl font-bold mb-4">
+
+Product Description
+
+</h2>
+
+
+<p className="text-gray-600 leading-7">
+
+{singleProduct.description}
+
+</p>
+
+
 </div>
 
 
 
 
 
-</div>
 
 
+{/* Related Products */}
 
 
+<div className="mt-10">
 
 
-
-
-
-{/* RELATED PRODUCTS */}
-
-
-
-<section className="mt-16">
-
-
-<h2 className="text-4xl font-bold">
+<h2 className="text-2xl font-bold mb-5">
 
 Related Products
 
@@ -402,29 +581,27 @@ Related Products
 
 
 
-
-<div className="grid md:grid-cols-4 gap-8 mt-8">
-
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
 
 
 {
 
 products
 
-.filter(
-(item)=>item._id !== product._id
+?.filter(
+item=>item._id!==singleProduct._id
 )
 
 .slice(0,4)
 
-.map((item)=>(
+.map(product=>(
 
 
 <ProductCard
 
-key={item._id}
+key={product._id}
 
-product={item}
+product={product}
 
 />
 
@@ -435,17 +612,7 @@ product={item}
 }
 
 
-
 </div>
-
-
-
-</section>
-
-
-
-
-
 
 
 </div>
@@ -455,11 +622,11 @@ product={item}
 </div>
 
 
+</div>
 
   );
 
 };
-
 
 
 export default ProductDetails;

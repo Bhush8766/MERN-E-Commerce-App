@@ -27,28 +27,46 @@ export const getProducts = createAsyncThunk(
 // =============================
 export const getSingleProduct = createAsyncThunk(
   "product/getSingleProduct",
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await getSingleProductApi(id);
+  async(id, {rejectWithValue})=>{
 
-      return response;
-    } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch product"
+    try{
+
+      const response = await axiosInstance.get(
+        `/products/${id}`
       );
+
+      console.log(
+        "Single Product Response:",
+        response.data
+      );
+
+      return response.data;
+
     }
+    catch(error){
+
+      return rejectWithValue(
+        error.response.data
+      );
+
+    }
+
   }
 );
 
 // =============================
 // Initial State
 // =============================
-const initialState = {
-    products: [],
-    selectedProduct: null,
-    product: null,
-    loading: false,
-    error: null,
+const initialState={
+
+products:[],
+
+singleProduct:null,
+
+loading:false,
+
+error:null
+
 };
 
 // =============================
@@ -86,19 +104,37 @@ const productSlice = createSlice({
       // =============================
       // Get Single Product
       // =============================
-      .addCase(getSingleProduct.pending, (state) => {
-        state.loading = true;
-      })
+     .addCase(
+getSingleProduct.pending,
+(state)=>{
 
-    .addCase(getSingleProduct.fulfilled, (state, action) => {
-    state.loading = false;
-    state.product = action.payload.product;
+state.loading=true;
+
 })
 
-      .addCase(getSingleProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
+
+.addCase(
+getSingleProduct.fulfilled,
+(state,action)=>{
+
+state.loading=false;
+
+state.singleProduct =
+action.payload.product;
+
+})
+
+
+.addCase(
+getSingleProduct.rejected,
+(state,action)=>{
+
+state.loading=false;
+
+state.error =
+action.payload;
+
+})
   },
 });
 

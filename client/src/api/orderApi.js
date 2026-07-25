@@ -74,7 +74,10 @@ export const getOrderByIdApi = async (id) => {
 };
 
 
-
+export const getOrderDetailsAPI = async (id) => {
+  const { data } = await axiosInstance.get(`/orders/${id}`);
+  return data;
+};
 
 // ==========================================
 // CANCEL ORDER

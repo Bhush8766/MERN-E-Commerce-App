@@ -11,6 +11,7 @@ import {
     getOrderByIdApi,
     cancelOrderApi,
     deleteOrderApi,
+    getOrderDetailsAPI
 } from "../api/orderApi";
 
 // ==========================================
@@ -65,6 +66,26 @@ export const getOrders = createAsyncThunk(
         }
     }
 );
+
+
+
+
+
+
+export const getOrderDetails = createAsyncThunk(
+  "orders/getOrderDetails",
+  async (id, thunkAPI) => {
+    try {
+      return await getOrderDetailsAPI(id);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to fetch order"
+      );
+    }
+  }
+);
+
+
 
 // ==========================================
 // UPDATE ORDER STATUS
@@ -264,6 +285,32 @@ const orderSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+
+
+
+
+
+
+
+
+
+
+
+
+            .addCase(getOrderDetails.pending, (state) => {
+  state.loading = true;
+})
+
+.addCase(getOrderDetails.fulfilled, (state, action) => {
+  state.loading = false;
+  state.order = action.payload.order;
+})
+
+.addCase(getOrderDetails.rejected, (state, action) => {
+  state.loading = false;
+  state.error = action.payload;
+})
 
             // ==================================
             // CANCEL ORDER
