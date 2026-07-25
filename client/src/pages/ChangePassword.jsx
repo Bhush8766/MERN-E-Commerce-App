@@ -1,203 +1,252 @@
-import { useState } from "react";
-import { Lock, Eye, EyeOff } from "lucide-react";
+import {
+useState
+} from "react";
 
-function ChangePassword() {
-  const [formData, setFormData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+
+import {
+useDispatch,
+useSelector
+} from "react-redux";
+
+
+import {
+changePassword
+} from "../redux/userSlice";
+
+
+
+function ChangePassword(){
+
+
+const dispatch=useDispatch();
+
+
+
+const {
+loading,
+success,
+error
+}=useSelector(
+state=>state.users
+);
+
+
+ const [formData,setFormData] = useState({
+    currentPassword:"",
+    newPassword:"",
+    confirmPassword:""
   });
 
-  const [showCurrent, setShowCurrent] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
-  const handleChange = (e) => {
+
+  const {
+    currentPassword,
+    newPassword,
+    confirmPassword
+  } = formData;
+
+
+
+  const handleChange = (e)=>{
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]:e.target.value
     });
+
   };
 
-  const handleSubmit = async (e) => {
+
+
+  const submitHandler = (e)=>{
+
     e.preventDefault();
 
-    if (formData.newPassword !== formData.confirmPassword) {
-      alert("New Password and Confirm Password do not match.");
+
+    if(newPassword !== confirmPassword){
+
+      alert("Passwords do not match");
       return;
+
     }
 
-    console.log("Password Data:", formData);
 
-    // TODO:
-    // dispatch(changePassword(formData));
+    dispatch(
+      changePassword({
+        currentPassword,
+        newPassword
+      })
+    );
+
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100 py-10">
 
-      <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
 
-        <h1 className="text-3xl font-bold mb-8">
-          Change Password
-        </h1>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6"
-        >
 
-          {/* Current Password */}
 
-          <div>
 
-            <label className="font-medium">
-              Current Password
-            </label>
+return (
 
-            <div className="relative mt-2">
+<div className="
+max-w-md
+mx-auto
+mt-10
+bg-white
+shadow
+rounded-xl
+p-6
+">
 
-              <Lock
-                className="absolute left-3 top-3 text-gray-400"
-                size={20}
-              />
 
-              <input
-                type={showCurrent ? "text" : "password"}
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleChange}
-                placeholder="Enter current password"
-                className="w-full border rounded-lg py-3 pl-11 pr-12"
-              />
+<h1 className="
+text-2xl
+font-bold
+mb-6
+">
 
-              <button
-                type="button"
-                onClick={() => setShowCurrent(!showCurrent)}
-                className="absolute right-3 top-3 text-gray-500"
-              >
-                {showCurrent ? (
-                  <EyeOff size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </button>
+Change Password
 
-            </div>
+</h1>
 
-          </div>
 
-          {/* New Password */}
 
-          <div>
+<form
+onSubmit={submitHandler}
+className="space-y-4"
+>
 
-            <label className="font-medium">
-              New Password
-            </label>
 
-            <div className="relative mt-2">
 
-              <Lock
-                className="absolute left-3 top-3 text-gray-400"
-                size={20}
-              />
+<input
 
-              <input
-                type={showNew ? "text" : "password"}
-                name="newPassword"
-                value={formData.newPassword}
-                onChange={handleChange}
-                placeholder="Enter new password"
-                className="w-full border rounded-lg py-3 pl-11 pr-12"
-              />
+type="password"
 
-              <button
-                type="button"
-                onClick={() => setShowNew(!showNew)}
-                className="absolute right-3 top-3 text-gray-500"
-              >
-                {showNew ? (
-                  <EyeOff size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </button>
+name="currentPassword"
 
-            </div>
+placeholder="Current Password"
 
-          </div>
+value={currentPassword}
+        onChange={handleChange}
 
-          {/* Confirm Password */}
+className="
+border
+w-full
+p-3
+rounded-lg
+"
 
-          <div>
+/>
 
-            <label className="font-medium">
-              Confirm Password
-            </label>
 
-            <div className="relative mt-2">
 
-              <Lock
-                className="absolute left-3 top-3 text-gray-400"
-                size={20}
-              />
+<input
 
-              <input
-                type={showConfirm ? "text" : "password"}
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirm new password"
-                className="w-full border rounded-lg py-3 pl-11 pr-12"
-              />
+type="password"
 
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-3 top-3 text-gray-500"
-              >
-                {showConfirm ? (
-                  <EyeOff size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </button>
+name="newPassword"
 
-            </div>
+placeholder="New Password"
 
-          </div>
+value={newPassword}
+        onChange={handleChange}
 
-          {/* Password Requirements */}
+className="
+border
+w-full
+p-3
+rounded-lg
+"
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+/>
 
-            <h3 className="font-semibold text-blue-700 mb-2">
-              Password Requirements
-            </h3>
 
-            <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
-              <li>Minimum 8 characters</li>
-              <li>At least one uppercase letter</li>
-              <li>At least one lowercase letter</li>
-              <li>At least one number</li>
-              <li>At least one special character</li>
-            </ul>
 
-          </div>
+<input
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
-          >
-            Update Password
-          </button>
+type="password"
 
-        </form>
+name="confirmPassword"
 
-      </div>
+placeholder="Confirm Password"
 
-    </div>
-  );
+onChange={handleChange}
+
+className="
+border
+w-full
+p-3
+rounded-lg
+"
+
+/>
+
+
+
+<button
+
+disabled={loading}
+
+className="
+bg-blue-600
+text-white
+w-full
+py-3
+rounded-lg
+"
+
+>
+
+{
+loading
+?
+"Updating..."
+:
+"Change Password"
 }
+
+</button>
+
+
+
+</form>
+
+
+
+
+
+{
+success &&
+
+<p className="text-green-600 mt-4">
+
+Password changed successfully
+
+</p>
+
+}
+
+
+
+{
+error &&
+
+<p className="text-red-600 mt-4">
+
+{error}
+
+</p>
+
+}
+
+
+
+</div>
+
+);
+
+
+}
+
 
 export default ChangePassword;

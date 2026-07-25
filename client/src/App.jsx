@@ -98,6 +98,11 @@ import OrderDetails from "./pages/OrderDetails";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailed from "./pages/PaymentFailed";
 
+import ChangePassword from "./pages/ChangePassword";
+
+
+import Address from "./pages/SavedAddresses"
+
 
 
 
@@ -216,6 +221,20 @@ element={
 />
 
 
+
+<Route
+ path="/change-password"
+ element={<ChangePassword />}
+/>
+
+<Route
+  path="/saved-addresses"
+  element={
+    <ProtectedRoute>
+      <Address />
+    </ProtectedRoute>
+  }
+/>
 
 </Route>
 

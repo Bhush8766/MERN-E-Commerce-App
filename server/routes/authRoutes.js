@@ -90,9 +90,9 @@ router.put(
 
 // Change Password
 router.put(
-  "/change-password",
-  protect,
-  changePassword
+ "/change-password",
+ protect,
+ changePassword
 );
 
 // ===============================

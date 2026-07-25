@@ -1,47 +1,227 @@
 import axiosInstance from "./axiosInstance";
 
-// =====================================
-// CUSTOMER PROFILE APIs
-// =====================================
 
-// Get Logged-in User Profile
-export const getProfileApi = async () => {
-  const { data } = await axiosInstance.get("/users/profile");
-  return data;
+
+
+// =====================================================
+// PROFILE
+// =====================================================
+
+
+// Get Profile
+
+export const getProfileApi = ()=>{
+
+return axiosInstance.get(
+"/users/profile"
+);
+
 };
 
-// Update Logged-in User Profile
-export const updateProfileApi = async (userData) => {
-  const { data } = await axiosInstance.put(
-    "/users/profile",
-    userData
-  );
 
-  return data;
+
+
+
+// Update Profile
+
+export const updateProfileApi=(data)=>{
+
+return axiosInstance.put(
+"/users/profile",
+data
+);
+
 };
 
-// =====================================
-// ADMIN APIs
-// =====================================
 
-// Get All Users
-export const getUsersApi = async () => {
-  const { data } = await axiosInstance.get("/users");
-  return data;
+
+
+
+
+
+
+
+// =====================================================
+// PASSWORD
+// =====================================================
+
+
+export const changePasswordApi=(data)=>{
+
+return axiosInstance.put(
+"/users/change-password",
+data
+);
+
 };
 
-// Update User Role
-export const updateUserRoleApi = async (id, role) => {
-  const { data } = await axiosInstance.patch(
-    `/users/role/${id}`,
-    { role }
-  );
 
-  return data;
+
+
+
+
+
+
+
+
+// =====================================================
+// ADMIN USERS
+// =====================================================
+
+
+// Get Users
+
+export const getUsersApi=()=>{
+
+return axiosInstance.get(
+"/users"
+);
+
 };
+
+
+
+
+// Update Role
+
+export const updateUserRoleApi=(id,role)=>{
+
+return axiosInstance.patch(
+
+`/users/role/${id}`,
+
+{
+role
+}
+
+);
+
+};
+
+
+
 
 // Delete User
-export const deleteUserApi = async (id) => {
-  const { data } = await axiosInstance.delete(`/users/${id}`);
-  return data;
+
+export const deleteUserApi=(id)=>{
+
+return axiosInstance.delete(
+
+`/users/${id}`
+
+);
+
+};
+
+
+
+
+
+
+
+
+
+// =====================================================
+// SAVED ADDRESS API
+// =====================================================
+
+
+// Get Saved Addresses
+
+export const getAddressesApi=()=>{
+
+return axiosInstance.get(
+
+"/users/addresses"
+
+);
+
+};
+
+
+
+
+
+
+
+// Add New Address
+
+export const addAddressApi=(data)=>{
+
+
+return axiosInstance.post(
+
+"/users/addresses",
+
+data
+
+);
+
+
+};
+
+
+
+
+
+
+
+
+// Update Address
+
+export const updateAddressApi=(id,data)=>{
+
+
+return axiosInstance.put(
+
+`/users/addresses/${id}`,
+
+data
+
+);
+
+
+};
+
+
+
+
+
+
+
+
+// Delete Address
+
+export const deleteAddressApi=(id)=>{
+
+
+return axiosInstance.delete(
+
+`/users/addresses/${id}`
+
+);
+
+
+};
+
+
+
+
+
+
+
+
+
+// Set Default Address
+
+export const setDefaultAddressApi=(id)=>{
+
+
+return axiosInstance.put(
+
+`/users/addresses/default/${id}`
+
+);
+
+
 };

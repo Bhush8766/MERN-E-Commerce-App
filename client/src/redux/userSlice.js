@@ -6,6 +6,15 @@ import {
   getUsersApi,
   updateUserRoleApi,
   deleteUserApi,
+  changePasswordApi,
+
+  // Address APIs
+  getAddressesApi,
+  addAddressApi,
+  updateAddressApi,
+  deleteAddressApi,
+  setDefaultAddressApi,
+
 } from "../api/userApi";
 
 // ======================================
@@ -76,6 +85,33 @@ export const updateUserRole = createAsyncThunk(
   }
 );
 
+
+
+
+// ======================================
+// CHANGE PASSWORD
+// ======================================
+
+export const changePassword = createAsyncThunk(
+  "user/changePassword",
+  async (data, { rejectWithValue }) => {
+
+    try {
+
+      const response = await changePasswordApi(data);
+
+      return response.data;
+
+    } catch(error){
+
+      return rejectWithValue(
+        error.response.data
+      );
+
+    }
+
+  }
+);
 // ======================================
 // DELETE USER (ADMIN)
 // ======================================
@@ -94,16 +130,171 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
+
+
+
+
+// ======================================
+// GET SAVED ADDRESSES
+// ======================================
+
+export const getAddresses = createAsyncThunk(
+  "users/getAddresses",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAddressesApi();
+
+      return response.data.addresses;
+
+    } catch (error) {
+
+      return rejectWithValue(
+        error.response?.data?.message ||
+        "Failed to load addresses"
+      );
+
+    }
+  }
+);
+
+
+
+// ======================================
+// ADD ADDRESS
+// ======================================
+
+export const addAddress = createAsyncThunk(
+  "users/addAddress",
+  async (data, { rejectWithValue }) => {
+
+    try {
+
+      const response = await addAddressApi(data);
+
+      return response.data.addresses;
+
+    } catch (error) {
+
+      return rejectWithValue(
+        error.response?.data?.message ||
+        "Failed to add address"
+      );
+
+    }
+
+  }
+);
+
+
+
+
+// ======================================
+// UPDATE ADDRESS
+// ======================================
+
+export const updateAddress = createAsyncThunk(
+  "users/updateAddress",
+  async ({ id, data }, { rejectWithValue }) => {
+
+    try {
+
+      const response = await updateAddressApi(id, data);
+
+      return response.data.addresses;
+
+    } catch (error) {
+
+      return rejectWithValue(
+        error.response?.data?.message ||
+        "Failed to update address"
+      );
+
+    }
+
+  }
+);
+
+
+
+
+// ======================================
+// DELETE ADDRESS
+// ======================================
+
+export const deleteAddress = createAsyncThunk(
+  "users/deleteAddress",
+  async (id, { rejectWithValue }) => {
+
+    try {
+
+      const response = await deleteAddressApi(id);
+
+      return response.data.addresses;
+
+    } catch (error) {
+
+      return rejectWithValue(
+        error.response?.data?.message ||
+        "Failed to delete address"
+      );
+
+    }
+
+  }
+);
+
+
+
+
+// ======================================
+// SET DEFAULT ADDRESS
+// ======================================
+
+export const setDefaultAddress = createAsyncThunk(
+  "users/setDefaultAddress",
+  async (id, { rejectWithValue }) => {
+
+    try {
+
+      const response = await setDefaultAddressApi(id);
+
+      return response.data.addresses;
+
+    } catch (error) {
+
+      return rejectWithValue(
+        error.response?.data?.message ||
+        "Failed to set default address"
+      );
+
+    }
+
+  }
+);
+
+
+
+
+
+
+
 const userSlice = createSlice({
   name: "users",
 
   initialState: {
-    profile: null,
-    users: [],
-    loading: false,
-    success: false,
-    error: null,
-  },
+  profile: null,
+
+  users: [],
+
+  // Saved Addresses
+  addresses: [],
+
+  loading: false,
+
+  success: false,
+
+  error: null,
+},
 
   reducers: {
     clearUserState: (state) => {
@@ -115,6 +306,38 @@ const userSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
+
+
+      // ======================================
+      // CHANGE PASSWORD
+      // ======================================
+
+
+      .addCase(changePassword.pending, (state) => {
+
+        state.loading = true;
+
+        state.success = false;
+
+      })
+
+
+      .addCase(changePassword.fulfilled, (state) => {
+
+        state.loading = false;
+
+        state.success = true;
+
+      })
+
+
+      .addCase(changePassword.rejected, (state, action) => {
+
+        state.loading = false;
+
+        state.error = action.payload;
+
+      })
 
       // ======================================
       // GET PROFILE
@@ -157,6 +380,11 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
+
+
+
+
+
       // ======================================
       // GET USERS
       // ======================================
@@ -187,6 +415,8 @@ const userSlice = createSlice({
         );
       })
 
+
+
       // ======================================
       // DELETE USER
       // ======================================
@@ -195,8 +425,159 @@ const userSlice = createSlice({
         state.users = state.users.filter(
           (user) => user._id !== action.payload
         );
-      });
-  },
+      })
+
+
+      // ======================================
+// GET SAVED ADDRESSES
+// ======================================
+
+.addCase(getAddresses.pending, (state) => {
+
+  state.loading = true;
+
+  state.error = null;
+
+})
+
+.addCase(getAddresses.fulfilled, (state, action) => {
+
+  state.loading = false;
+
+  state.addresses = action.payload;
+
+})
+
+.addCase(getAddresses.rejected, (state, action) => {
+
+  state.loading = false;
+
+  state.error = action.payload;
+
+})
+
+
+
+// ======================================
+// ADD ADDRESS
+// ======================================
+
+.addCase(addAddress.pending, (state) => {
+
+  state.loading = true;
+
+})
+
+.addCase(addAddress.fulfilled, (state, action) => {
+
+  state.loading = false;
+
+  state.success = true;
+
+  state.addresses = action.payload;
+
+})
+
+.addCase(addAddress.rejected, (state, action) => {
+
+  state.loading = false;
+
+  state.error = action.payload;
+
+})
+
+
+
+// ======================================
+// UPDATE ADDRESS
+// ======================================
+
+.addCase(updateAddress.pending, (state) => {
+
+  state.loading = true;
+
+})
+
+.addCase(updateAddress.fulfilled, (state, action) => {
+
+  state.loading = false;
+
+  state.success = true;
+
+  state.addresses = action.payload;
+
+})
+
+.addCase(updateAddress.rejected, (state, action) => {
+
+  state.loading = false;
+
+  state.error = action.payload;
+
+})
+
+
+
+// ======================================
+// DELETE ADDRESS
+// ======================================
+
+.addCase(deleteAddress.pending, (state) => {
+
+  state.loading = true;
+
+})
+
+.addCase(deleteAddress.fulfilled, (state, action) => {
+
+  state.loading = false;
+
+  state.success = true;
+
+  state.addresses = action.payload;
+
+})
+
+.addCase(deleteAddress.rejected, (state, action) => {
+
+  state.loading = false;
+
+  state.error = action.payload;
+
+})
+
+
+
+// ======================================
+// SET DEFAULT ADDRESS
+// ======================================
+
+.addCase(setDefaultAddress.pending, (state) => {
+
+  state.loading = true;
+
+})
+
+.addCase(setDefaultAddress.fulfilled, (state, action) => {
+
+  state.loading = false;
+
+  state.success = true;
+
+  state.addresses = action.payload;
+
+})
+
+.addCase(setDefaultAddress.rejected, (state, action) => {
+
+  state.loading = false;
+
+  state.error = action.payload;
+
+})
+}
+
+
 });
 
 export const { clearUserState } = userSlice.actions;
