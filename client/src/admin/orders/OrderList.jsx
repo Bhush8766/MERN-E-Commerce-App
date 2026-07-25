@@ -1,38 +1,27 @@
 import {
-useEffect
-}
-from "react";
+    useEffect,
+    useState
+} from "react";
 
 
 import {
-useDispatch,
-useSelector
-}
-from "react-redux";
+    useDispatch,
+    useSelector
+} from "react-redux";
 
 
 import {
-getOrders,
-updateOrderStatus,
-deleteOrder
-}
-from "../../redux/orderSlice";
+    useNavigate
+} from "react-router-dom";
 
 
+import {
+    getAdminOrders,
+    updateOrderStatus,
+    deleteOrder
+} from "../../redux/orderSlice";
 
 
-const statusList=[
-
-"Pending",
-"Confirmed",
-"Processing",
-"Shipped",
-"Out for Delivery",
-"Delivered",
-"Cancelled",
-"Returned"
-
-];
 
 
 
@@ -41,11 +30,30 @@ function OrderList(){
 
 const dispatch = useDispatch();
 
+const navigate = useNavigate();
+
+
+
+// ==========================
+// LOCAL STATE
+// ==========================
+
+const [search,setSearch] = useState("");
+
+const [statusFilter,setStatusFilter] =
+useState("All");
+
+
+
+
+// ==========================
+// REDUX STATE
+// ==========================
 
 
 const {
-adminOrders,
-loading
+    orders = [],
+    loading
 }
 =
 useSelector(
@@ -54,10 +62,21 @@ state=>state.orders
 
 
 
+
+
+
+
+// ==========================
+// FETCH ORDERS
+// ==========================
+
+
 useEffect(()=>{
 
 
-dispatch(getOrders());
+dispatch(
+    getAdminOrders()
+);
 
 
 },[dispatch]);
@@ -67,18 +86,24 @@ dispatch(getOrders());
 
 
 
-const changeStatus=(id,status)=>{
+
+
+// ==========================
+// STATUS UPDATE
+// ==========================
+
+
+const handleStatusChange = (
+    id,
+    status
+)=>{
 
 
 dispatch(
-
-updateOrderStatus({
-
-id,
-status
-
-})
-
+    updateOrderStatus({
+        id,
+        status
+    })
 );
 
 
@@ -88,25 +113,99 @@ status
 
 
 
-const removeOrder=(id)=>{
+
+
+
+// ==========================
+// DELETE ORDER
+// ==========================
+
+
+const handleDelete = (id)=>{
 
 
 const confirmDelete =
 window.confirm(
-"Delete this order?"
+"Are you sure you want to delete this order?"
 );
+
 
 
 if(confirmDelete){
 
 dispatch(
-deleteOrder(id)
+    deleteOrder(id)
 );
 
 }
 
 
 };
+
+
+
+
+
+
+
+
+// ==========================
+// FILTER ORDERS
+// ==========================
+
+
+const filteredOrders =
+
+orders.filter(order=>{
+
+
+const searchValue =
+search.toLowerCase();
+
+
+
+const searchMatch =
+
+
+order._id
+?.toLowerCase()
+.includes(searchValue)
+
+
+
+||
+
+order.user?.name
+?.toLowerCase()
+.includes(searchValue)
+
+;
+
+
+
+const statusMatch =
+
+
+statusFilter==="All"
+
+?
+
+true
+
+:
+
+order.orderStatus===statusFilter;
+
+
+
+return searchMatch && statusMatch;
+
+
+
+});
+
+
+
 
 
 
@@ -118,7 +217,8 @@ return (
 <div className="p-6">
 
 
-<h1 className="text-3xl font-bold mb-6">
+
+<h1 className="text-3xl font-bold mb-8">
 
 Order Management
 
@@ -126,62 +226,248 @@ Order Management
 
 
 
-{
-loading &&
 
-<p>
-Loading Orders...
-</p>
 
+
+
+
+
+{/* FILTER */}
+
+<div className="
+bg-white
+shadow
+rounded-xl
+p-5
+mb-8
+flex
+flex-col
+md:flex-row
+gap-4
+">
+
+
+
+<input
+
+
+type="text"
+
+
+placeholder="Search Order ID or Customer"
+
+
+value={search}
+
+
+onChange={
+e=>setSearch(e.target.value)
 }
 
 
+className="
+border
+rounded-lg
+px-4
+py-3
+flex-1
+outline-none
+"
+
+/>
 
 
-<div className="overflow-x-auto">
 
 
-<table className="w-full border">
 
 
-<thead>
+<select
 
 
-<tr className="bg-gray-100">
+value={statusFilter}
 
 
-<th className="p-3 border">
+onChange={
+e=>setStatusFilter(e.target.value)
+}
+
+
+className="
+border
+rounded-lg
+px-4
+py-3
+"
+
+
+
+>
+
+
+<option value="All">
+All
+</option>
+
+
+<option value="Pending">
+Pending
+</option>
+
+
+<option value="Processing">
+Processing
+</option>
+
+
+<option value="Shipped">
+Shipped
+</option>
+
+
+<option value="Delivered">
+Delivered
+</option>
+
+
+<option value="Cancelled">
+Cancelled
+</option>
+
+
+</select>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+{/* TABLE */}
+
+
+
+<div className="
+bg-white
+shadow
+rounded-xl
+overflow-hidden
+">
+
+
+
+
+
+{
+
+loading
+
+?
+
+(
+
+<div className="p-10 text-center">
+
+Loading Orders...
+
+</div>
+
+)
+
+
+:
+
+
+filteredOrders.length===0
+
+
+?
+
+
+(
+
+<div className="
+p-10
+text-center
+text-gray-500
+">
+
+No Orders Found
+
+</div>
+
+)
+
+
+:
+
+
+(
+
+
+
+<table className="w-full">
+
+
+
+<thead className="bg-gray-100">
+
+
+<tr>
+
+
+<th className="p-4 text-left">
+
 Order ID
+
 </th>
 
 
-<th className="p-3 border">
+<th className="p-4 text-left">
+
 Customer
+
 </th>
 
 
-<th className="p-3 border">
-Items
+<th className="p-4">
+
+Date
+
 </th>
 
 
-<th className="p-3 border">
+<th className="p-4">
+
 Amount
+
 </th>
 
 
-<th className="p-3 border">
+<th className="p-4">
+
 Payment
+
 </th>
 
 
-<th className="p-3 border">
+<th className="p-4">
+
 Status
+
 </th>
 
 
-<th className="p-3 border">
+<th className="p-4">
+
 Action
+
 </th>
 
 
@@ -194,73 +480,143 @@ Action
 
 
 
+
+
 <tbody>
 
 
+
 {
-adminOrders?.map(order=>(
+
+filteredOrders.map(order=>(
 
 
-<tr key={order._id}>
+<tr
+
+key={order._id}
+
+className="
+border-b
+hover:bg-gray-50
+"
 
 
-<td className="border p-3">
+>
 
-{order._id.slice(-8)}
+
+
+<td className="p-4">
+
+#{order._id.slice(-8)}
 
 </td>
 
 
 
 
-<td className="border p-3">
+
+
+<td className="p-4">
+
+
+<p className="font-semibold">
+
+{
+order.user?.name ||
+"Customer"
+}
+
+</p>
+
+
+<p className="text-sm text-gray-500">
+
+{
+order.user?.email ||
+""
+}
+
+</p>
+
+
+</td>
+
+
+
+
+
+
+
+
+<td className="p-4 text-center">
 
 
 {
-order.user?.name
+new Date(
+order.createdAt
+)
+.toLocaleDateString()
 }
 
 
-<br/>
+</td>
+
+
+
+
+
+
+
+<td className="p-4 text-center font-semibold">
+
+
+₹ {order.totalPrice || 0}
+
+
+</td>
+
+
+
+
+
+
+
+<td className="p-4 text-center">
+
+
+<span className={`
+
+px-3
+py-1
+rounded-full
+text-sm
+
+${
+order.paymentStatus==="Paid"
+
+?
+
+"bg-green-100 text-green-700"
+
+:
+
+"bg-yellow-100 text-yellow-700"
+
+}
+
+`}>
+
 
 
 {
-order.user?.email
+order.paymentStatus ||
+"Pending"
 }
 
 
-</td>
 
+</span>
 
-
-
-<td className="border p-3">
-
-{
-order.totalItems
-}
-
-</td>
-
-
-
-
-<td className="border p-3">
-
-₹ {order.totalPrice}
-
-</td>
-
-
-
-
-<td className="border p-3">
-
-{order.paymentMethod}
-
-<br/>
-
-{order.paymentStatus}
 
 </td>
 
@@ -268,72 +624,136 @@ order.totalItems
 
 
 
-<td className="border p-3">
+
+
+
+
+<td className="p-4 text-center">
+
 
 
 <select
 
+
 value={
-order.orderStatus
+order.orderStatus || "Pending"
 }
 
-onChange={(e)=>
 
-changeStatus(
-
+onChange={
+e=>
+handleStatusChange(
 order._id,
 e.target.value
-
 )
-
 }
 
 
-className="border p-2"
+className="
+border
+rounded-lg
+px-3
+py-2
+"
 
 
->
-
-
-{
-
-statusList.map(status=>(
-
-<option
-
-key={status}
-
-value={status}
 
 >
 
-{status}
 
+<option>
+Pending
 </option>
 
 
-))
+<option>
+Processing
+</option>
 
-}
+
+<option>
+Shipped
+</option>
+
+
+<option>
+Delivered
+</option>
+
+
+<option>
+Cancelled
+</option>
 
 
 </select>
 
 
+
 </td>
 
 
 
 
 
-<td className="border p-3">
+
+
+
+
+<td className="p-4">
+
+
+<div className="flex gap-2">
+
 
 
 <button
 
-onClick={()=>removeOrder(order._id)}
 
-className="bg-red-500 text-white px-4 py-2 rounded"
+onClick={()=>
+
+navigate(
+`/admin/orders/${order._id}`
+)
+
+}
+
+
+className="
+bg-blue-600
+text-white
+px-3
+py-2
+rounded-lg
+"
+
+
+>
+
+View
+
+</button>
+
+
+
+
+
+
+
+<button
+
+
+onClick={()=>handleDelete(order._id)}
+
+
+className="
+bg-red-500
+text-white
+px-3
+py-2
+rounded-lg
+"
+
 
 >
 
@@ -342,7 +762,14 @@ Delete
 </button>
 
 
+
+</div>
+
+
 </td>
+
+
+
 
 
 
@@ -351,6 +778,7 @@ Delete
 
 ))
 
+
 }
 
 
@@ -358,10 +786,25 @@ Delete
 </tbody>
 
 
+
 </table>
 
 
+
+)
+
+
+}
+
+
+
+
+
 </div>
+
+
+
+
 
 
 </div>
@@ -370,6 +813,7 @@ Delete
 
 
 }
+
 
 
 export default OrderList;

@@ -1,81 +1,39 @@
-import axios from "axios";
-
-const API = axios.create({
-  baseURL: "http://localhost:5000/api/orders",
-});
-
-
-// Add Token Automatically
-
-API.interceptors.request.use((config) => {
-
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-
-});
-
-
+import axiosInstance from "./axiosInstance";
 
 // ==========================================
 // CREATE ORDER
 // POST /api/orders/create
 // ==========================================
-
-export const createOrderApi = async (data) => {
-
-  const response = await API.post(
-    "/create",
-    data
+export const createOrderApi = async (orderData) => {
+  const { data } = await axiosInstance.post(
+    "/orders/create",
+    orderData
   );
 
-  return response.data;
-
+  return data;
 };
-
-
-
 
 // ==========================================
 // GET MY ORDERS
 // GET /api/orders/my-orders
 // ==========================================
-
 export const getMyOrdersApi = async () => {
-
-  const response = await API.get(
-    "/my-orders"
+  const { data } = await axiosInstance.get(
+    "/orders/my-orders"
   );
 
-  return response.data;
-
+  return data;
 };
-
-
-
 
 // ==========================================
 // GET SINGLE ORDER
 // GET /api/orders/:id
 // ==========================================
-
-export const getOrderByIdApi = async (id) => {
-
-  const response = await API.get(
-    `/${id}`
+export const getOrderDetailsAPI = async (id) => {
+  const { data } = await axiosInstance.get(
+    `/orders/${id}`
   );
 
-  return response.data;
-
-};
-
-
-export const getOrderDetailsAPI = async (id) => {
-  const { data } = await axiosInstance.get(`/orders/${id}`);
   return data;
 };
 
@@ -83,73 +41,52 @@ export const getOrderDetailsAPI = async (id) => {
 // CANCEL ORDER
 // PATCH /api/orders/cancel/:id
 // ==========================================
-
 export const cancelOrderApi = async (id) => {
-
-  const response = await API.patch(
-    `/cancel/${id}`
+  const { data } = await axiosInstance.patch(
+    `/orders/cancel/${id}`
   );
 
-  return response.data;
-
+  return data;
 };
 
-
-
-
-
-// ======================================
-// ADMIN GET ALL ORDERS
-// ======================================
-
+// ==========================================
+// ADMIN - GET ALL ORDERS
+// GET /api/orders
+// ==========================================
 export const getAdminOrdersApi = async () => {
+  const { data } = await axiosInstance.get(
+    "/orders"
+  );
 
-    const response = await axios.get(
-        "/orders"
-    );
-
-    return response.data;
-
+  return data;
 };
 
-
-
-// ======================================
-// UPDATE ORDER STATUS
-// ======================================
-
+// ==========================================
+// ADMIN - UPDATE ORDER STATUS
+// PATCH /api/orders/status/:id
+// ==========================================
 export const updateOrderStatusApi = async (
-    id,
-    status
+  id,
+  status
 ) => {
+  const { data } = await axiosInstance.patch(
+    `/orders/status/${id}`,
+    {
+      status,
+    }
+  );
 
-    const response = await axios.patch(
-        `/orders/status/${id}`,
-        {
-            status,
-        }
-    );
-
-
-    return response.data;
-
+  return data;
 };
 
+// ==========================================
+// ADMIN - DELETE ORDER
+// DELETE /api/orders/:id
+// ==========================================
+export const deleteOrderApi = async (id) => {
+  const { data } = await axiosInstance.delete(
+    `/orders/${id}`
+  );
 
-
-// ======================================
-// DELETE ORDER
-// ======================================
-
-export const deleteOrderApi = async (
-    id
-) => {
-
-    const response = await axios.delete(
-        `/orders/${id}`
-    );
-
-
-    return response.data;
-
+  return data;
 };

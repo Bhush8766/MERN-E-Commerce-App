@@ -1,31 +1,56 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { User, Mail, Phone, Camera } from "lucide-react";
 
+import {
+  getProfile,
+  updateProfile,
+  clearUserState,
+} from "../redux/userSlice";
+
 function EditProfile() {
-  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  const {
+    profile,
+    loading,
+    success,
+    error,
+  } = useSelector((state) => state.users);
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    avatar: null,
   });
 
   const [preview, setPreview] = useState("");
 
+  // Load profile from backend
   useEffect(() => {
-    if (user) {
+    dispatch(getProfile());
+  }, [dispatch]);
+
+  // Fill form when profile is loaded
+  useEffect(() => {
+    if (profile) {
       setFormData({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        avatar: null,
+        name: profile.name || "",
+        email: profile.email || "",
+        phone: profile.phone || "",
       });
 
-      setPreview(user.avatar?.url || "");
+      setPreview(profile.avatar?.url || "");
     }
-  }, [user]);
+  }, [profile]);
+
+  // Show success message
+  useEffect(() => {
+    if (success) {
+      alert("Profile updated successfully.");
+      dispatch(clearUserState());
+    }
+  }, [success, dispatch]);
 
   const handleChange = (e) => {
     setFormData({
@@ -39,21 +64,15 @@ function EditProfile() {
 
     if (!file) return;
 
-    setFormData({
-      ...formData,
-      avatar: file,
-    });
-
+    // Preview only.
+    // Avatar upload will be connected later when backend supports it.
     setPreview(URL.createObjectURL(file));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log("Profile Data", formData);
-
-    // TODO:
-    // dispatch(updateProfile(formData));
+    dispatch(updateProfile(formData));
   };
 
   return (
@@ -65,10 +84,18 @@ function EditProfile() {
           Edit Profile
         </h1>
 
+        {error && (
+          <div className="mb-6 bg-red-100 text-red-600 p-3 rounded-lg">
+            {error}
+          </div>
+        )}
+
         <form
           onSubmit={handleSubmit}
           className="space-y-6"
         >
+
+          {/* Avatar */}
 
           <div className="flex flex-col items-center">
 
@@ -79,26 +106,28 @@ function EditProfile() {
                   preview ||
                   "https://ui-avatars.com/api/?name=User"
                 }
-                alt="Avatar"
-                className="w-32 h-32 rounded-full object-cover border-4 border-blue-500"
+                alt="Profile"
+                className="w-32 h-32 rounded-full object-cover border-4 border-blue-600"
               />
 
-              <label
-                className="absolute bottom-0 right-0 bg-blue-600 p-3 rounded-full text-white cursor-pointer"
-              >
+              <label className="absolute bottom-0 right-0 bg-blue-600 p-3 rounded-full text-white cursor-pointer">
+
                 <Camera size={18} />
 
                 <input
                   type="file"
-                  accept="image/*"
                   hidden
+                  accept="image/*"
                   onChange={handleImage}
                 />
+
               </label>
 
             </div>
 
           </div>
+
+          {/* Name */}
 
           <div>
 
@@ -119,11 +148,14 @@ function EditProfile() {
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full border rounded-lg py-3 pl-11 pr-4"
+                required
               />
 
             </div>
 
           </div>
+
+          {/* Email */}
 
           <div>
 
@@ -144,16 +176,19 @@ function EditProfile() {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full border rounded-lg py-3 pl-11 pr-4"
+                required
               />
 
             </div>
 
           </div>
 
+          {/* Phone */}
+
           <div>
 
             <label className="font-medium">
-              Phone
+              Phone Number
             </label>
 
             <div className="relative mt-2">
@@ -177,9 +212,10 @@ function EditProfile() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition disabled:bg-gray-400"
           >
-            Save Changes
+            {loading ? "Updating..." : "Save Changes"}
           </button>
 
         </form>

@@ -9,24 +9,33 @@ import QuickActions from "../components/profile/QuickActions";
 
 import { getMyOrders } from "../redux/orderSlice";
 import { getWishlist } from "../redux/wishlistSlice";
+import { getProfile } from "../redux/userSlice";
 
 function Profile() {
   const dispatch = useDispatch();
 
-  const { loading: orderLoading, orders = [] } = useSelector(
-    (state) => state.orders
-  );
+  const {
+    profile,
+    loading: profileLoading,
+  } = useSelector((state) => state.users);
 
-  const { loading: wishlistLoading, items = [] } = useSelector(
-    (state) => state.wishlist
-  );
+  const {
+    loading: orderLoading,
+    orders = [],
+  } = useSelector((state) => state.orders);
+
+  const {
+    loading: wishlistLoading,
+    items = [],
+  } = useSelector((state) => state.wishlist);
 
   useEffect(() => {
+    dispatch(getProfile());
     dispatch(getMyOrders());
     dispatch(getWishlist());
   }, [dispatch]);
 
-  if (orderLoading || wishlistLoading) {
+  if (profileLoading || orderLoading || wishlistLoading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
         <h2 className="text-2xl font-semibold">
@@ -51,21 +60,48 @@ function Profile() {
 
           <ProfileSidebar />
 
-          {/* Main Dashboard */}
+          {/* Dashboard */}
 
           <div className="lg:col-span-3 space-y-8">
 
-            {/* Welcome */}
+            {/* Welcome Card */}
 
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-lg p-8 text-white">
 
-              <h2 className="text-3xl font-bold">
-                Welcome Back 👋
-              </h2>
+              <div className="flex flex-col md:flex-row items-center gap-6">
 
-              <p className="mt-3 text-blue-100">
-                Manage your profile, orders, wishlist and addresses from one dashboard.
-              </p>
+                <img
+                  src={
+                    profile?.avatar?.url ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      profile?.name || "User"
+                    )}`
+                  }
+                  alt="Profile"
+                  className="w-28 h-28 rounded-full border-4 border-white object-cover"
+                />
+
+                <div>
+
+                  <h2 className="text-3xl font-bold">
+                    {profile?.name}
+                  </h2>
+
+                  <p className="text-blue-100 mt-2">
+                    {profile?.email}
+                  </p>
+
+                  <p className="text-blue-100">
+                    {profile?.phone || "No phone number"}
+                  </p>
+
+                  <div className="mt-4 inline-flex px-4 py-2 bg-white/20 rounded-full text-sm">
+                    {profile?.role}
+                  </div>
+
+                </div>
+
+              </div>
 
             </div>
 

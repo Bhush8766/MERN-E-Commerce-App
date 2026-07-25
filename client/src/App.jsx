@@ -60,6 +60,7 @@ import {
 // Admin Pages
 
 import Dashboard from "./admin/dashboard/Dashboard";
+// import OrderDetails from "./admin/OrderDetails";
 
 
 // Products
@@ -326,6 +327,7 @@ element={
 
 <AdminRoute>
 
+
 <AdminLayout />
 
 </AdminRoute>
@@ -333,7 +335,22 @@ element={
 }
 
 
+
 >
+
+
+{/* 
+<Route
+path="/admin/orders"
+element={<OrderList/>}
+/>
+
+
+
+<Route
+path="/admin/orders/:id"
+element={<OrderDetails/>}
+/> */}
 
 
 

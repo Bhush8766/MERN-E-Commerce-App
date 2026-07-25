@@ -1,14 +1,50 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import {
+  getProfileApi,
+  updateProfileApi,
   getUsersApi,
   updateUserRoleApi,
   deleteUserApi,
 } from "../api/userApi";
 
-// ==============================
-// GET USERS
-// ==============================
+// ======================================
+// GET LOGGED-IN USER PROFILE
+// ======================================
+
+export const getProfile = createAsyncThunk(
+  "users/getProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await getProfileApi();
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to load profile"
+      );
+    }
+  }
+);
+
+// ======================================
+// UPDATE PROFILE
+// ======================================
+
+export const updateProfile = createAsyncThunk(
+  "users/updateProfile",
+  async (userData, { rejectWithValue }) => {
+    try {
+      return await updateProfileApi(userData);
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update profile"
+      );
+    }
+  }
+);
+
+// ======================================
+// GET ALL USERS (ADMIN)
+// ======================================
 
 export const getUsers = createAsyncThunk(
   "users/getUsers",
@@ -23,9 +59,9 @@ export const getUsers = createAsyncThunk(
   }
 );
 
-// ==============================
-// UPDATE USER ROLE
-// ==============================
+// ======================================
+// UPDATE USER ROLE (ADMIN)
+// ======================================
 
 export const updateUserRole = createAsyncThunk(
   "users/updateRole",
@@ -40,9 +76,9 @@ export const updateUserRole = createAsyncThunk(
   }
 );
 
-// ==============================
-// DELETE USER
-// ==============================
+// ======================================
+// DELETE USER (ADMIN)
+// ======================================
 
 export const deleteUser = createAsyncThunk(
   "users/delete",
@@ -62,19 +98,68 @@ const userSlice = createSlice({
   name: "users",
 
   initialState: {
+    profile: null,
     users: [],
     loading: false,
+    success: false,
     error: null,
   },
 
-  reducers: {},
+  reducers: {
+    clearUserState: (state) => {
+      state.loading = false;
+      state.success = false;
+      state.error = null;
+    },
+  },
 
   extraReducers: (builder) => {
     builder
 
-      // ======================
+      // ======================================
+      // GET PROFILE
+      // ======================================
+
+      .addCase(getProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.profile = action.payload.user;
+      })
+
+      .addCase(getProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // ======================================
+      // UPDATE PROFILE
+      // ======================================
+
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.success = false;
+        state.error = null;
+      })
+
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.profile = action.payload.user;
+      })
+
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload;
+      })
+
+      // ======================================
       // GET USERS
-      // ======================
+      // ======================================
 
       .addCase(getUsers.pending, (state) => {
         state.loading = true;
@@ -90,9 +175,9 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ======================
+      // ======================================
       // UPDATE ROLE
-      // ======================
+      // ======================================
 
       .addCase(updateUserRole.fulfilled, (state, action) => {
         state.users = state.users.map((user) =>
@@ -102,9 +187,9 @@ const userSlice = createSlice({
         );
       })
 
-      // ======================
+      // ======================================
       // DELETE USER
-      // ======================
+      // ======================================
 
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.users = state.users.filter(
@@ -113,5 +198,7 @@ const userSlice = createSlice({
       });
   },
 });
+
+export const { clearUserState } = userSlice.actions;
 
 export default userSlice.reducer;

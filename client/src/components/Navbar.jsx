@@ -1,141 +1,272 @@
-import { Link } from "react-router-dom";
-import { FaShoppingCart, FaHeart, FaUser } from "react-icons/fa";
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
-import { useSelector, useDispatch } from "react-redux";
+import {
+  ShoppingCart,
+  Heart,
+  User,
+  Package,
+  MapPin,
+  Lock,
+  LogOut,
+  LayoutDashboard,
+  ChevronDown,
+} from "lucide-react";
 
 import { logout } from "../redux/authSlice";
 
+function Navbar() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
+  const { user } = useSelector((state) => state.auth);
 
-const Navbar = () => {
+  const { items: cartItems = [] } = useSelector(
+    (state) => state.cart
+  );
 
+  const { items: wishlistItems = [] } = useSelector(
+    (state) => state.wishlist
+  );
 
-const dispatch = useDispatch();
+  const [openMenu, setOpenMenu] = useState(false);
 
+  const menuRef = useRef(null);
 
-const { user } = useSelector(
-(state)=>state.auth
-);
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target)
+      ) {
+        setOpenMenu(false);
+      }
+    }
 
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside
+    );
 
-const { count } = useSelector(
-  (state) => state.wishlist
-);
+    return () =>
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
+  }, []);
 
-const cartItems =
-useSelector(
-state=>state.cart.items
-);
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
 
+  return (
+    <nav className="bg-white shadow-md">
 
+      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
 
-const cartCount =
-cartItems.reduce(
+        {/* Logo */}
 
-(total,item)=>
-total + item.quantity
+        <Link
+          to="/"
+          className="text-4xl font-bold text-blue-600"
+        >
+          ShopSphere
+        </Link>
 
-,0);
+        {/* Right Side */}
 
+        <div className="flex items-center gap-6">
 
+          <Link
+            to="/shop"
+            className="hover:text-blue-600"
+          >
+            Shop
+          </Link>
 
+          {/* Wishlist */}
 
-return (
+          <Link
+            to="/wishlist"
+            className="relative"
+          >
+            <Heart
+              size={22}
+              className="text-red-500"
+            />
 
-<nav className="bg-white shadow-md px-6 py-4">
+            {wishlistItems.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                {wishlistItems.length}
+              </span>
+            )}
 
+          </Link>
 
-<div className="max-w-7xl mx-auto flex justify-between items-center">
+          {/* Cart */}
 
+          <Link
+            to="/cart"
+            className="relative"
+          >
+            <ShoppingCart size={22} />
 
-<Link 
-to="/"
-className="text-3xl font-bold text-blue-600"
->
-ShopSphere
-</Link>
+            {cartItems.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-blue-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                {cartItems.length}
+              </span>
+            )}
 
+          </Link>
 
+          {/* User */}
 
-<div className="flex items-center gap-6">
+          {user ? (
 
+            <div
+              className="relative"
+              ref={menuRef}
+            >
 
-<Link to="/shop">
-Shop
-</Link>
+              <button
+                onClick={() =>
+                  setOpenMenu(!openMenu)
+                }
+                className="flex items-center gap-2 font-medium hover:text-blue-600"
+              >
 
+                <User size={18} />
 
-<Link to="/wishlist">
-<FaHeart className="text-red-500"/>
-</Link>
+                <span>
+                  Hi {user.name}
+                </span>
 
+                <ChevronDown
+                  size={16}
+                  className={`transition ${
+                    openMenu
+                      ? "rotate-180"
+                      : ""
+                  }`}
+                />
 
-<Link to="/cart">
-<FaShoppingCart />  
-{/* ({cartCount}) */}
-</Link>
+              </button>
 
+              {openMenu && (
 
+                <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border overflow-hidden z-50">
 
-{
-user ? (
+                  <div className="bg-blue-600 text-white p-4">
 
-<>
+                    <p className="font-semibold">
+                      {user.name}
+                    </p>
 
-<span>
-Hi {user.name}
-</span>
+                    <p className="text-sm">
+                      {user.email}
+                    </p>
 
+                  </div>
 
-<button
-onClick={()=>dispatch(logout())}
-className="text-red-500"
->
-Logout
-</button>
+                  <Link
+                    to="/profile"
+                    onClick={() =>
+                      setOpenMenu(false)
+                    }
+                    className="flex items-center gap-3 px-5 py-3 hover:bg-gray-100"
+                  >
+                    <LayoutDashboard size={18} />
+                    Dashboard
+                  </Link>
 
+                  <Link
+                    to="/my-orders"
+                    onClick={() =>
+                      setOpenMenu(false)
+                    }
+                    className="flex items-center gap-3 px-5 py-3 hover:bg-gray-100"
+                  >
+                    <Package size={18} />
+                    My Orders
+                  </Link>
 
-</>
+                  <Link
+                    to="/wishlist"
+                    onClick={() =>
+                      setOpenMenu(false)
+                    }
+                    className="flex items-center gap-3 px-5 py-3 hover:bg-gray-100"
+                  >
+                    <Heart size={18} />
+                    Wishlist
+                  </Link>
 
+                  <Link
+                    to="/saved-addresses"
+                    onClick={() =>
+                      setOpenMenu(false)
+                    }
+                    className="flex items-center gap-3 px-5 py-3 hover:bg-gray-100"
+                  >
+                    <MapPin size={18} />
+                    Saved Addresses
+                  </Link>
 
-):(
+                  <Link
+                    to="/change-password"
+                    onClick={() =>
+                      setOpenMenu(false)
+                    }
+                    className="flex items-center gap-3 px-5 py-3 hover:bg-gray-100"
+                  >
+                    <Lock size={18} />
+                    Change Password
+                  </Link>
 
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-5 py-3 text-red-600 hover:bg-red-50"
+                  >
+                    <LogOut size={18} />
+                    Logout
+                  </button>
 
-<>
+                </div>
 
-<Link to="/login">
-Login
-</Link>
+              )}
 
+            </div>
 
-<Link 
-to="/register"
-className="bg-blue-600 text-white px-4 py-2 rounded-lg"
->
-Register
-</Link>
+          ) : (
 
+            <div className="flex items-center gap-4">
 
-</>
+              <Link
+                to="/login"
+                className="hover:text-blue-600"
+              >
+                Login
+              </Link>
 
+              <Link
+                to="/register"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              >
+                Register
+              </Link>
 
-)
+            </div>
 
+          )}
+
+        </div>
+
+      </div>
+
+    </nav>
+  );
 }
-
-
-</div>
-
-
-</div>
-
-
-</nav>
-
-);
-
-
-};
-
 
 export default Navbar;
