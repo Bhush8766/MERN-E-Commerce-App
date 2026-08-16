@@ -15,7 +15,7 @@ const Shop = () => {
   const { products, loading } = useSelector(
     (state) => state.product
   );    
-
+    
   // Filters
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
