@@ -8,6 +8,7 @@ import ProductFilter from "../components/ProductFilter";
 import Loader from "../components/Loader";
 import Pagination from "../components/Pagination";
 
+
 const Shop = () => {
   const dispatch = useDispatch();
 
