@@ -9,7 +9,7 @@ import Loader from "../components/Loader";
 import Pagination from "../components/Pagination";
 
 
-const Shop = () => {
+const Shop = () => {    
   const dispatch = useDispatch();
 
   const { products, loading } = useSelector(
