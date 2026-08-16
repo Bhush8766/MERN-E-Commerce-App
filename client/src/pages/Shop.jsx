@@ -17,7 +17,7 @@ const Shop = () => {
   );    
     
   // Filters
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");   
   const [category, setCategory] = useState("");
   const [brand, setBrand] = useState("");
   const [sort, setSort] = useState("");
