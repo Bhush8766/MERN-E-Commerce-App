@@ -4,6 +4,10 @@ const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema(
   {
+    // ======================================
+    // BASIC INFORMATION
+    // ======================================
+
     name: {
       type: String,
       required: [true, "Name is required"],
@@ -36,16 +40,25 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
+    // ======================================
+    // AVATAR
+    // ======================================
+
     avatar: {
       public_id: {
         type: String,
         default: "",
       },
+
       url: {
         type: String,
         default: "",
       },
     },
+
+    // ======================================
+    // GENDER
+    // ======================================
 
     gender: {
       type: String,
@@ -53,11 +66,19 @@ const userSchema = new mongoose.Schema(
       default: "Other",
     },
 
+    // ======================================
+    // ROLE
+    // ======================================
+
     role: {
       type: String,
       enum: ["Customer", "Vendor", "Admin"],
       default: "Customer",
     },
+
+    // ======================================
+    // SAVED ADDRESSES
+    // ======================================
 
     addresses: [
       {
@@ -68,12 +89,17 @@ const userSchema = new mongoose.Schema(
         state: String,
         country: String,
         pincode: String,
+
         isDefault: {
           type: Boolean,
           default: false,
         },
       },
     ],
+
+    // ======================================
+    // WISHLIST
+    // ======================================
 
     wishlist: [
       {
@@ -82,10 +108,18 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
+    // ======================================
+    // CART
+    // ======================================
+
     cart: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Cart",
     },
+
+    // ======================================
+    // ORDERS
+    // ======================================
 
     orders: [
       {
@@ -93,6 +127,10 @@ const userSchema = new mongoose.Schema(
         ref: "Order",
       },
     ],
+
+    // ======================================
+    // ACCOUNT VERIFICATION
+    // ======================================
 
     isVerified: {
       type: Boolean,
@@ -108,9 +146,17 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
 
+    // ======================================
+    // PASSWORD RESET
+    // ======================================
+
     resetPasswordToken: String,
 
     resetPasswordExpire: Date,
+
+    // ======================================
+    // ACCOUNT STATUS
+    // ======================================
 
     status: {
       type: String,
@@ -118,45 +164,65 @@ const userSchema = new mongoose.Schema(
       default: "Active",
     },
   },
+
   {
     timestamps: true,
   }
 );
 
 // ======================================
-// Hash Password Before Save
+// HASH PASSWORD BEFORE SAVE
 // ======================================
+
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) {
+    return next();
+  }
 
   const salt = await bcrypt.genSalt(10);
 
-  this.password = await bcrypt.hash(this.password, salt);
+  this.password = await bcrypt.hash(
+    this.password,
+    salt
+  );
 
   next();
 });
 
 // ======================================
-// Compare Password
+// COMPARE PASSWORD
 // ======================================
-userSchema.methods.comparePassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+
+userSchema.methods.comparePassword = async function (
+  enteredPassword
+) {
+  return await bcrypt.compare(
+    enteredPassword,
+    this.password
+  );
 };
 
 // ======================================
-// Generate JWT Token
+// GENERATE JWT TOKEN
 // ======================================
+
 userSchema.methods.generateToken = function () {
   return jwt.sign(
     {
       id: this._id,
       role: this.role,
     },
+
     process.env.JWT_SECRET,
+
     {
-      expiresIn: process.env.JWT_EXPIRE || "7d",
+      expiresIn:
+        process.env.JWT_EXPIRE || "7d",
     }
   );
 };
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model(
+  "User",
+  userSchema
+);

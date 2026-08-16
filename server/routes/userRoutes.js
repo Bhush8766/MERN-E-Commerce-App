@@ -2,9 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-
 const {
-
   getAllUsers,
   getUserById,
   updateUser,
@@ -17,223 +15,207 @@ const {
   updateUserProfile,
   changePassword,
 
-
   // Address Controllers
-
   getAddresses,
   addAddress,
   updateAddress,
   deleteAddress,
-  setDefaultAddress
-
-
+  setDefaultAddress,
 } = require("../controllers/userController");
-
-
 
 const { protect } = require("../middleware/authMiddleware");
 
 const authorize = require("../middleware/roleMiddleware");
 
-
-
-
 // =====================================================
-// Logged In User Routes
+// LOGGED-IN USER ROUTES
 // =====================================================
 
-
-// Get My Profile
+// ======================================
+// GET MY PROFILE
+// GET /api/users/profile
+// ======================================
 
 router.get(
-"/profile",
-protect,
-getUserProfile
+  "/profile",
+  protect,
+  getUserProfile
 );
 
-
-
-// Update My Profile
+// ======================================
+// UPDATE MY PROFILE
+// PUT /api/users/profile
+// ======================================
 
 router.put(
-"/profile",
-protect,
-updateUserProfile
+  "/profile",
+  protect,
+  updateUserProfile
 );
 
-
-
-
-// Change Password
+// ======================================
+// CHANGE PASSWORD
+// PUT /api/users/change-password
+// ======================================
 
 router.put(
-"/change-password",
-protect,
-changePassword
+  "/change-password",
+  protect,
+  changePassword
 );
-
-
-
-
-
 
 // =====================================================
 // SAVED ADDRESS ROUTES
 // =====================================================
 
-
-
-// Get All Addresses
+// ======================================
+// GET ADDRESSES
+// GET /api/users/addresses
+// ======================================
 
 router.get(
-"/addresses",
-protect,
-getAddresses
+  "/addresses",
+  protect,
+  getAddresses
 );
 
-
-
-
-// Add Address
+// ======================================
+// ADD ADDRESS
+// POST /api/users/addresses
+// ======================================
 
 router.post(
-"/addresses",
-protect,
-addAddress
+  "/addresses",
+  protect,
+  addAddress
 );
 
-
-
-
-// Update Address
+// ======================================
+// UPDATE ADDRESS
+// PUT /api/users/addresses/:id
+// ======================================
 
 router.put(
-"/addresses/:id",
-protect,
-updateAddress
+  "/addresses/:id",
+  protect,
+  updateAddress
 );
 
-
-
-
-// Delete Address
+// ======================================
+// DELETE ADDRESS
+// DELETE /api/users/addresses/:id
+// ======================================
 
 router.delete(
-"/addresses/:id",
-protect,
-deleteAddress
+  "/addresses/:id",
+  protect,
+  deleteAddress
 );
 
-
-
-
-// Set Default Address
+// ======================================
+// SET DEFAULT ADDRESS
+// PUT /api/users/addresses/default/:id
+// ======================================
 
 router.put(
-"/addresses/default/:id",
-protect,
-setDefaultAddress
+  "/addresses/default/:id",
+  protect,
+  setDefaultAddress
 );
 
-
-
-
-
-
-
 // =====================================================
-// User Management Routes
+// ADMIN USER MANAGEMENT
 // =====================================================
 
-
-// Get All Users
+// ======================================
+// GET ALL USERS
+// GET /api/users
+// ADMIN ONLY
+// ======================================
 
 router.get(
-"/",
-protect,
-getAllUsers
+  "/",
+  protect,
+  authorize("Admin"),
+  getAllUsers
 );
 
-
-
-
-// Get Single User
+// ======================================
+// GET SINGLE USER
+// GET /api/users/:id
+// ADMIN ONLY
+// ======================================
 
 router.get(
-"/:id",
-protect,
-getUserById
+  "/:id",
+  protect,
+  authorize("Admin"),
+  getUserById
 );
 
-
-
-
-
-
-
-
-// =====================================================
-// ADMIN ROUTES
-// =====================================================
-
-
-// Update User
+// ======================================
+// UPDATE USER
+// PUT /api/users/:id
+// ADMIN ONLY
+// ======================================
 
 router.put(
-"/:id",
-protect,
-authorize("Admin"),
-updateUser
+  "/:id",
+  protect,
+  authorize("Admin"),
+  updateUser
 );
 
-
-
-
-// Delete User
+// ======================================
+// DELETE USER
+// DELETE /api/users/:id
+// ADMIN ONLY
+// ======================================
 
 router.delete(
-"/:id",
-protect,
-authorize("Admin"),
-deleteUser
+  "/:id",
+  protect,
+  authorize("Admin"),
+  deleteUser
 );
 
-
-
-
-// Block User
+// ======================================
+// BLOCK USER
+// PATCH /api/users/block/:id
+// ADMIN ONLY
+// ======================================
 
 router.patch(
-"/block/:id",
-protect,
-authorize("Admin"),
-blockUser
+  "/block/:id",
+  protect,
+  authorize("Admin"),
+  blockUser
 );
 
-
-
-
-// Unblock User
+// ======================================
+// UNBLOCK USER
+// PATCH /api/users/unblock/:id
+// ADMIN ONLY
+// ======================================
 
 router.patch(
-"/unblock/:id",
-protect,
-authorize("Admin"),
-unblockUser
+  "/unblock/:id",
+  protect,
+  authorize("Admin"),
+  unblockUser
 );
 
-
-
-
-// Update Role
+// ======================================
+// CHANGE USER ROLE
+// PATCH /api/users/role/:id
+// ADMIN ONLY
+// ======================================
 
 router.patch(
-"/role/:id",
-protect,
-authorize("Admin"),
-updateUserRole
+  "/role/:id",
+  protect,
+  authorize("Admin"),
+  updateUserRole
 );
-
-
 
 module.exports = router;

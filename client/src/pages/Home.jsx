@@ -11,7 +11,7 @@ import HeroSection from "../components/home/HeroSection";
 import FeaturesSection from "../components/home/FeaturesSection";
 
 const Home = () => {
-
+   
 
   const dispatch = useDispatch();
 

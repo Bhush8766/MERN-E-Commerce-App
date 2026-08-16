@@ -1,227 +1,232 @@
 import axiosInstance from "./axiosInstance";
 
-
-
-
 // =====================================================
 // PROFILE
 // =====================================================
 
+// ==========================================
+// GET MY PROFILE
+// GET /api/users/profile
+// ==========================================
 
-// Get Profile
-
-export const getProfileApi = ()=>{
-
-return axiosInstance.get(
-"/users/profile"
-);
-
+export const getProfileApi = async () => {
+  return await axiosInstance.get(
+    "/users/profile"
+  );
 };
 
+// ==========================================
+// UPDATE MY PROFILE
+// PUT /api/users/profile
+// ==========================================
 
-
-
-
-// Update Profile
-
-export const updateProfileApi=(data)=>{
-
-return axiosInstance.put(
-"/users/profile",
-data
-);
-
+export const updateProfileApi = async (
+  data
+) => {
+  return await axiosInstance.put(
+    "/users/profile",
+    data
+  );
 };
-
-
-
-
-
-
-
-
 
 // =====================================================
 // PASSWORD
 // =====================================================
 
+// ==========================================
+// CHANGE PASSWORD
+// PUT /api/users/change-password
+// ==========================================
 
-export const changePasswordApi=(data)=>{
-
-return axiosInstance.put(
-"/users/change-password",
-data
-);
-
+export const changePasswordApi = async (
+  data
+) => {
+  return await axiosInstance.put(
+    "/users/change-password",
+    data
+  );
 };
-
-
-
-
-
-
-
-
-
 
 // =====================================================
-// ADMIN USERS
+// ADMIN USER MANAGEMENT
 // =====================================================
 
+// ==========================================
+// GET ALL USERS
+// GET /api/users
+// ==========================================
 
-// Get Users
+export const getUsersApi = async () => {
+  const { data } =
+    await axiosInstance.get(
+      "/users"
+    );
 
-export const getUsersApi=()=>{
-
-return axiosInstance.get(
-"/users"
-);
-
+  return data;
 };
 
+// ==========================================
+// GET SINGLE USER
+// GET /api/users/:id
+// ==========================================
 
+export const getUserByIdApi = async (
+  id
+) => {
+  const { data } =
+    await axiosInstance.get(
+      `/users/${id}`
+    );
 
-
-// Update Role
-
-export const updateUserRoleApi=(id,role)=>{
-
-return axiosInstance.patch(
-
-`/users/role/${id}`,
-
-{
-role
-}
-
-);
-
+  return data;
 };
 
+// ==========================================
+// UPDATE USER
+// PUT /api/users/:id
+// ==========================================
 
+export const updateUserApi = async (
+  id,
+  userData
+) => {
+  const { data } =
+    await axiosInstance.put(
+      `/users/${id}`,
+      userData
+    );
 
-
-// Delete User
-
-export const deleteUserApi=(id)=>{
-
-return axiosInstance.delete(
-
-`/users/${id}`
-
-);
-
+  return data;
 };
 
+// ==========================================
+// BLOCK USER
+// PATCH /api/users/block/:id
+// ==========================================
 
+export const blockUserApi = async (
+  id
+) => {
+  const { data } =
+    await axiosInstance.patch(
+      `/users/block/${id}`
+    );
 
+  return data;
+};
 
+// ==========================================
+// UNBLOCK USER
+// PATCH /api/users/unblock/:id
+// ==========================================
 
+export const unblockUserApi = async (
+  id
+) => {
+  const { data } =
+    await axiosInstance.patch(
+      `/users/unblock/${id}`
+    );
 
+  return data;
+};
 
+// ==========================================
+// UPDATE USER ROLE
+// PATCH /api/users/role/:id
+// ==========================================
 
+export const updateUserRoleApi = async (
+  id,
+  role
+) => {
+  const { data } =
+    await axiosInstance.patch(
+      `/users/role/${id}`,
+      {
+        role,
+      }
+    );
+
+  return data;
+};
+
+// ==========================================
+// DELETE USER
+// DELETE /api/users/:id
+// ==========================================
+
+export const deleteUserApi = async (
+  id
+) => {
+  const { data } =
+    await axiosInstance.delete(
+      `/users/${id}`
+    );
+
+  return data;
+};
 
 // =====================================================
 // SAVED ADDRESS API
 // =====================================================
 
+// ==========================================
+// GET ADDRESSES
+// ==========================================
 
-// Get Saved Addresses
-
-export const getAddressesApi=()=>{
-
-return axiosInstance.get(
-
-"/users/addresses"
-
-);
-
+export const getAddressesApi = async () => {
+  return await axiosInstance.get(
+    "/users/addresses"
+  );
 };
 
+// ==========================================
+// ADD ADDRESS
+// ==========================================
 
-
-
-
-
-
-// Add New Address
-
-export const addAddressApi=(data)=>{
-
-
-return axiosInstance.post(
-
-"/users/addresses",
-
-data
-
-);
-
-
+export const addAddressApi = async (
+  data
+) => {
+  return await axiosInstance.post(
+    "/users/addresses",
+    data
+  );
 };
 
+// ==========================================
+// UPDATE ADDRESS
+// ==========================================
 
-
-
-
-
-
-
-// Update Address
-
-export const updateAddressApi=(id,data)=>{
-
-
-return axiosInstance.put(
-
-`/users/addresses/${id}`,
-
-data
-
-);
-
-
+export const updateAddressApi = async (
+  id,
+  data
+) => {
+  return await axiosInstance.put(
+    `/users/addresses/${id}`,
+    data
+  );
 };
 
+// ==========================================
+// DELETE ADDRESS
+// ==========================================
 
-
-
-
-
-
-
-// Delete Address
-
-export const deleteAddressApi=(id)=>{
-
-
-return axiosInstance.delete(
-
-`/users/addresses/${id}`
-
-);
-
-
+export const deleteAddressApi = async (
+  id
+) => {
+  return await axiosInstance.delete(
+    `/users/addresses/${id}`
+  );
 };
 
+// ==========================================
+// SET DEFAULT ADDRESS
+// ==========================================
 
-
-
-
-
-
-
-
-// Set Default Address
-
-export const setDefaultAddressApi=(id)=>{
-
-
-return axiosInstance.put(
-
-`/users/addresses/default/${id}`
-
-);
-
-
-};
+export const setDefaultAddressApi =
+  async (id) => {
+    return await axiosInstance.put(
+      `/users/addresses/default/${id}`
+    );
+  };

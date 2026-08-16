@@ -12,6 +12,8 @@ import userReducer from "./userSlice";
 import dashboardReducer from "./dashboardSlice";
 import checkoutReducer from "./checkoutSlice";
 
+import vendorReducer from "./vendorSlice";
+
 import reviewReducer
 from "./reviewSlice";
 
@@ -51,7 +53,9 @@ const store = configureStore({
 
     checkout: checkoutReducer,
 
-    review: reviewReducer
+    review: reviewReducer,
+
+    vendor: vendorReducer,
   },
 });
 
