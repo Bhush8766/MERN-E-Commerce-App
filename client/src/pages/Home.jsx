@@ -13,7 +13,7 @@ import FeaturesSection from "../components/home/FeaturesSection";
 const Home = () => {
      
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch();       
 
 
 
