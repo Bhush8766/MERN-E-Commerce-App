@@ -17,7 +17,7 @@ const Home = () => {
 
 
 
-const { products, loading } = useSelector(
+const { products, loading } = useSelector(       
     (state) => state.product
 );
 
