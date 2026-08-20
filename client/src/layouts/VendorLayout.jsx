@@ -114,12 +114,11 @@ const VendorLayout = () => {
           MAIN CONTENT
       ================================================== */}
 
-      <main className="ml-64 flex-1 min-h-screen">
+      <main className="ml-64 flex-1 min-h-screen">  
         <Outlet />   
       </main>  
     </div>  
   );
 };
 
-export default VendorLayout;    
- 
+export default VendorLayout;         

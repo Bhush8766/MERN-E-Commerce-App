@@ -7,7 +7,7 @@ import {
   updateCart,
   removeCart,
 } from "../redux/cartSlice";
-    
+                
 function Cart() {
   const dispatch = useDispatch();
 
