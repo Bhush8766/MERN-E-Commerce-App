@@ -121,4 +121,4 @@ const VendorLayout = () => {
   );
 };
 
-export default VendorLayout;  
+export default VendorLayout;     
