@@ -9,7 +9,7 @@ import {
 } from "../redux/cartSlice";
                 
 function Cart() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch();     
 
   const { items, loading } = useSelector((state) => state.cart);
 
