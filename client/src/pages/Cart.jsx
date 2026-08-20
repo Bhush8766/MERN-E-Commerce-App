@@ -18,7 +18,7 @@ function Cart() {
   }, [dispatch]);
 
   if (loading) {
-    return (
+    return (   
       <div className="text-center py-20">
         <h2 className="text-2xl font-bold">Loading Cart...</h2>
       </div>
